@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prototype 4 — Neon Reef</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; background: #050810; color: #8aa0b8; overflow-x: hidden; }
+
+canvas#neon-scene { position: fixed; inset: 0; z-index: 0; }
+
+nav {
+  position: fixed; top: 0; width: 100%; padding: 1.2rem 3rem; display: flex;
+  justify-content: space-between; align-items: center; z-index: 100;
+  background: rgba(5,8,16,0.85); backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(0,240,255,0.06);
+}
+.nav-logo { font-family: 'Space Grotesk'; font-weight: 800; font-size: 1.1rem; background: linear-gradient(135deg, #00f0ff, #ff2daa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { color: rgba(138,160,184,0.5); text-decoration: none; font-size: 0.8rem; font-weight: 500; transition: color 0.3s; }
+.nav-links a:hover { color: #00f0ff; }
+
+section { min-height: 100vh; display: flex; align-items: center; padding: 6rem 4rem; position: relative; z-index: 2; }
+
+.hero { justify-content: center; text-align: center; flex-direction: column; }
+.hero-eyebrow { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 5px; color: #ff2daa; margin-bottom: 1.5rem; font-weight: 600; }
+.hero h1 { font-family: 'Space Grotesk'; font-size: clamp(3.5rem, 8vw, 7rem); font-weight: 800; color: #f0f4ff; line-height: 1.05; margin-bottom: 1.5rem; }
+.hero h1 .line-2 { background: linear-gradient(135deg, #00f0ff, #ff2daa, #5e5eff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-size: 300% 300%; animation: gradient-flow 6s ease infinite; }
+@keyframes gradient-flow { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+.hero-sub { font-size: 1.05rem; color: rgba(138,160,184,0.55); max-width: 480px; margin: 0 auto 3rem; line-height: 1.7; }
+.hero-cta { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.9rem 2rem; border-radius: 50px; background: linear-gradient(135deg, rgba(0,240,255,0.1), rgba(255,45,170,0.06)); border: 1px solid rgba(0,240,255,0.2); color: #00f0ff; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.4s; }
+.hero-cta:hover { box-shadow: 0 0 30px rgba(0,240,255,0.15); border-color: #00f0ff; }
+
+.tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 3px; color: #ff2daa; font-weight: 600; margin-bottom: 1rem; }
+.heading { font-family: 'Space Grotesk'; font-size: 2.5rem; font-weight: 700; color: #e8f0ff; margin-bottom: 1.5rem; }
+.heading span { color: #00f0ff; }
+
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; max-width: 1000px; margin: 0 auto; width: 100%; }
+.col p { font-size: 0.92rem; line-height: 1.8; color: rgba(138,160,184,0.6); }
+.col strong { color: #c8dae8; }
+
+.neon-stats { display: flex; gap: 2rem; margin-top: 2rem; }
+.neon-stat { text-align: center; }
+.neon-stat .val { font-family: 'Space Grotesk'; font-size: 1.8rem; font-weight: 700; color: #00f0ff; text-shadow: 0 0 15px rgba(0,240,255,0.4); }
+.neon-stat .lbl { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 2px; color: rgba(138,160,184,0.3); margin-top: 0.2rem; }
+
+.exp-section { flex-direction: column; max-width: 700px; margin: 0 auto; }
+.exp-item { padding: 2rem; margin-bottom: 1rem; border-radius: 16px; border: 1px solid rgba(0,240,255,0.06); background: rgba(0,240,255,0.02); transition: border-color 0.3s; }
+.exp-item:hover { border-color: rgba(0,240,255,0.15); }
+.exp-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.3rem; }
+.exp-top h3 { font-family: 'Space Grotesk'; font-size: 1.2rem; font-weight: 600; color: #eaf0ff; }
+.exp-date { font-size: 0.75rem; color: #ff2daa; font-weight: 500; }
+.exp-role { font-size: 0.85rem; color: rgba(138,160,184,0.5); margin-bottom: 0.4rem; }
+.exp-desc { font-size: 0.85rem; color: rgba(138,160,184,0.4); line-height: 1.6; }
+
+.hobbies-section { flex-direction: column; max-width: 800px; margin: 0 auto; text-align: center; }
+.hobby-pills { display: flex; flex-wrap: wrap; gap: 0.8rem; justify-content: center; margin-top: 1.5rem; }
+.hobby-pill { padding: 0.7rem 1.4rem; border-radius: 50px; font-size: 0.85rem; border: 1px solid rgba(0,240,255,0.08); color: rgba(200,218,232,0.65); background: rgba(0,240,255,0.02); transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; }
+.hobby-pill:hover { border-color: rgba(0,240,255,0.25); box-shadow: 0 0 15px rgba(0,240,255,0.08); color: #00f0ff; }
+.hobby-pill .icon { font-size: 1.2rem; }
+
+.contact { justify-content: center; flex-direction: column; text-align: center; align-items: center; }
+.contact p { font-size: 0.95rem; color: rgba(138,160,184,0.45); max-width: 400px; margin-bottom: 2rem; }
+.contact-btns { display: flex; gap: 1rem; }
+.neon-btn { padding: 0.8rem 1.8rem; border-radius: 50px; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: all 0.4s; border: 1px solid rgba(0,240,255,0.2); color: #b0c4d4; }
+.neon-btn:hover { color: #00f0ff; border-color: #00f0ff; box-shadow: 0 0 20px rgba(0,240,255,0.15); }
+.neon-btn.primary { background: linear-gradient(135deg, rgba(0,240,255,0.1), rgba(255,45,170,0.06)); color: #00f0ff; }
+
+@media (max-width: 768px) {
+  section { padding: 4rem 1.5rem; }
+  .two-col { grid-template-columns: 1fr; gap: 2rem; }
+}
+</style>
+</head>
+<body>
+<canvas id="neon-scene"></canvas>
+
+<nav>
+  <div class="nav-logo">AG</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#exp">Experience</a></li>
+    <li><a href="#life">Life</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow">Software Engineer</div>
+  <h1>Alexandra<br><span class="line-2">Garibaldi</span></h1>
+  <p class="hero-sub">Building at Amazon by day. Diving, dancing, and exploring by night. Based in NYC.</p>
+  <a href="#about" class="hero-cta">Dive In ↓</a>
+</section>
+
+<section id="about">
+  <div class="two-col">
+    <div class="col">
+      <div class="tag">About</div>
+      <h2 class="heading">Engineer.<br><span>Diver. Explorer.</span></h2>
+      <div class="neon-stats">
+        <div class="neon-stat"><span class="val">4.0</span><span class="lbl">GPA</span></div>
+        <div class="neon-stat"><span class="val">NYC</span><span class="lbl">Based</span></div>
+        <div class="neon-stat"><span class="val">PADI</span><span class="lbl">Certified</span></div>
+      </div>
+    </div>
+    <div class="col">
+      <p>I'm a software engineer who believes life is too short for just one hobby. After graduating from West Chester University with a <strong>4.0 GPA</strong> on a full-tuition scholarship, I moved to NYC and joined <strong>Amazon</strong>.</p><br>
+      <p>I'm a PADI-certified scuba diver, a hip hop dancer, a skier, a field hockey player, a pianist, an avid reader, and a festival regular.</p>
+    </div>
+  </div>
+</section>
+
+<section id="exp" class="exp-section">
+  <div class="tag">Experience</div>
+  <h2 class="heading">Where I've <span>Built</span></h2>
+  <div class="exp-item">
+    <div class="exp-top"><h3>Amazon</h3><span class="exp-date">Present</span></div>
+    <p class="exp-role">Software Engineer · NYC</p>
+    <p class="exp-desc">Building scalable, high-impact systems. Shipping features that serve millions of users globally.</p>
+  </div>
+  <div class="exp-item">
+    <div class="exp-top"><h3>West Chester University</h3><span class="exp-date">2017 – 2021</span></div>
+    <p class="exp-role">B.S. Computer Science · 4.0 Major GPA</p>
+    <p class="exp-desc">Board of Governor's Full Tuition Scholar. Honors College. Dean's List.</p>
+  </div>
+</section>
+
+<section id="life" class="hobbies-section">
+  <div class="tag">A Rich Life</div>
+  <h2 class="heading">I collect hobbies like they're<br><span>going out of style.</span></h2>
+  <div class="hobby-pills">
+    <div class="hobby-pill"><span class="icon">🤿</span> Scuba Diving</div>
+    <div class="hobby-pill"><span class="icon">⛷️</span> Skiing</div>
+    <div class="hobby-pill"><span class="icon">💃</span> Hip Hop Dance</div>
+    <div class="hobby-pill"><span class="icon">🏑</span> Field Hockey</div>
+    <div class="hobby-pill"><span class="icon">🎹</span> Piano</div>
+    <div class="hobby-pill"><span class="icon">📚</span> Reading</div>
+    <div class="hobby-pill"><span class="icon">🎶</span> EDM & Festivals</div>
+    <div class="hobby-pill"><span class="icon">🌊</span> Ocean Life</div>
+  </div>
+</section>
+
+<section id="contact" class="contact">
+  <div class="tag">Connect</div>
+  <h2 class="heading"><span>Say Hello</span></h2>
+  <p>Whether it's about code, the ocean, or the next festival — I'd love to hear from you.</p>
+  <div class="contact-btns">
+    <a href="https://github.com/aygaribaldi" class="neon-btn primary" target="_blank">GitHub</a>
+    <a href="https://linkedin.com/in/alexandra-garibaldi" class="neon-btn" target="_blank">LinkedIn</a>
+  </div>
+</section>
+
+<script>
+const canvas = document.getElementById('neon-scene');
+const ctx = canvas.getContext('2d');
+let w, h;
+function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+// Neon particles (bioluminescent plankton)
+const particles = Array.from({length: 80}, () => ({
+  x: Math.random() * 2000, y: Math.random() * 2000,
+  r: 1 + Math.random() * 3, speed: 0.1 + Math.random() * 0.4,
+  color: ['0,240,255', '255,45,170', '94,94,255', '168,85,247'][Math.floor(Math.random() * 4)],
+  phase: Math.random() * Math.PI * 2
+}));
+
+// Laser beams
+const lasers = Array.from({length: 8}, (_, i) => ({
+  x: w * 0.1 + i * w * 0.11,
+  color: ['0,240,255', '255,45,170', '94,94,255', '168,85,247', '0,240,255', '255,45,170', '12,250,202', '168,85,247'][i],
+  speed: 0.3 + Math.random() * 0.4, phase: Math.random() * Math.PI * 2,
+  width: 1 + Math.random() * 1.5
+}));
+
+// Jellyfish
+const jellies = Array.from({length: 5}, (_, i) => ({
+  x: w * 0.1 + Math.random() * w * 0.8,
+  y: h * 0.2 + Math.random() * h * 0.6,
+  size: 12 + Math.random() * 20,
+  color: ['255,105,180', '0,229,255', '168,85,247', '34,211,238', '233,121,249'][i],
+  speed: 0.3 + Math.random() * 0.5, phase: Math.random() * Math.PI * 2
+}));
+
+// Coral at bottom
+const corals = Array.from({length: 15}, () => ({
+  x: Math.random() * w,
+  height: 30 + Math.random() * 60,
+  width: 3 + Math.random() * 5,
+  color: ['255,107,107', '232,89,74', '255,138,92', '255,71,87', '200,91,57'][Math.floor(Math.random() * 5)],
+  branches: 1 + Math.floor(Math.random() * 3)
+}));
+
+const seaPlants = Array.from({length: 10}, () => ({
+  x: Math.random() * w,
+  height: 40 + Math.random() * 50,
+  color: ['46,204,113', '26,188,156', '0,184,148'][Math.floor(Math.random() * 3)],
+  phase: Math.random() * Math.PI * 2
+}));
+
+function draw(t) {
+  ctx.clearRect(0, 0, w, h);
+
+  // Subtle grid
+  ctx.strokeStyle = 'rgba(0,240,255,0.015)';
+  ctx.lineWidth = 1;
+  for (let x = 0; x < w; x += 60) { ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke(); }
+  for (let y = 0; y < h; y += 60) { ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke(); }
+
+  // Laser beams (background)
+  lasers.forEach(l => {
+    const angle = Math.sin(t * 0.0008 * l.speed + l.phase) * 0.25;
+    ctx.save();
+    ctx.translate(l.x, h + 20);
+    ctx.rotate(-Math.PI/2 + angle);
+    const opacity = 0.06 + Math.sin(t * 0.003 + l.phase) * 0.03;
+    ctx.fillStyle = `rgba(${l.color},${opacity})`;
+    ctx.fillRect(-l.width, 0, l.width * 2, h);
+    ctx.fillStyle = `rgba(${l.color},${opacity * 0.3})`;
+    ctx.fillRect(-l.width * 6, 0, l.width * 12, h);
+    ctx.restore();
+  });
+
+  // Coral reef at bottom
+  corals.forEach(c => {
+    const sway = Math.sin(t * 0.001 + c.x) * 2;
+    ctx.strokeStyle = `rgba(${c.color},0.2)`;
+    ctx.lineWidth = c.width;
+    ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(c.x, h);
+    ctx.quadraticCurveTo(c.x + sway, h - c.height * 0.6, c.x + sway * 1.5, h - c.height);
+    ctx.stroke();
+    if (c.branches > 1) {
+      ctx.beginPath();
+      ctx.moveTo(c.x + sway * 0.8, h - c.height * 0.5);
+      ctx.quadraticCurveTo(c.x + sway + 10, h - c.height * 0.7, c.x + sway + 15, h - c.height * 0.85);
+      ctx.lineWidth = c.width * 0.6;
+      ctx.stroke();
+    }
+  });
+
+  // Sea plants
+  seaPlants.forEach(p => {
+    const sway = Math.sin(t * 0.002 + p.phase) * 8;
+    ctx.strokeStyle = `rgba(${p.color},0.12)`;
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(p.x, h);
+    ctx.bezierCurveTo(p.x + sway * 0.3, h - p.height * 0.3, p.x + sway * 0.7, h - p.height * 0.6, p.x + sway, h - p.height);
+    ctx.stroke();
+  });
+
+  // Jellyfish
+  jellies.forEach(j => {
+    const jx = j.x + Math.sin(t * 0.0005 + j.phase) * 30;
+    const jy = j.y + Math.sin(t * 0.0008 * j.speed + j.phase) * 20;
+    const pulse = 1 + Math.sin(t * 0.003 * j.speed) * 0.12;
+
+    // Glow
+    const glow = ctx.createRadialGradient(jx, jy, 0, jx, jy, j.size * 2.5);
+    glow.addColorStop(0, `rgba(${j.color},0.08)`);
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(jx - j.size * 3, jy - j.size * 3, j.size * 6, j.size * 6);
+
+    // Bell
+    ctx.beginPath();
+    ctx.ellipse(jx, jy, j.size * pulse * 0.9, j.size * pulse * 0.6, 0, Math.PI, 0);
+    ctx.fillStyle = `rgba(${j.color},0.2)`;
+    ctx.fill();
+    ctx.strokeStyle = `rgba(${j.color},0.3)`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Tentacles
+    for (let i = 0; i < 5; i++) {
+      const tx = jx - j.size * 0.4 + i * j.size * 0.2;
+      const sw = Math.sin(t * 0.003 + i + j.phase) * 4;
+      ctx.beginPath();
+      ctx.moveTo(tx, jy + j.size * 0.15);
+      ctx.quadraticCurveTo(tx + sw, jy + j.size * 0.7, tx + sw * 1.5, jy + j.size * 1.1 + i * 2);
+      ctx.strokeStyle = `rgba(${j.color},0.12)`;
+      ctx.lineWidth = 0.8;
+      ctx.stroke();
+    }
+  });
+
+  // Bioluminescent particles
+  particles.forEach(p => {
+    p.y -= p.speed;
+    p.x += Math.sin(t * 0.001 + p.phase) * 0.3;
+    if (p.y < -10) { p.y = h + 10; p.x = Math.random() * w; }
+    const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 3);
+    glow.addColorStop(0, `rgba(${p.color},${0.3 + Math.sin(t * 0.003 + p.phase) * 0.15})`);
+    glow.addColorStop(1, 'transparent');
+    ctx.fillStyle = glow;
+    ctx.fillRect(p.x - p.r * 3, p.y - p.r * 3, p.r * 6, p.r * 6);
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r * 0.5, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${p.color},0.5)`;
+    ctx.fill();
+  });
+
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>

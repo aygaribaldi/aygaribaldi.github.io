@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prototype 2 — Bento Ocean</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #0b0f1a; color: #b8c8d8; min-height: 100vh; padding: 1.5rem; }
+
+/* Animated underwater canvas bg */
+canvas#ocean-canvas { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+.bento { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; max-width: 1100px; margin: 0 auto; position: relative; z-index: 1; }
+
+.card {
+  background: rgba(12, 18, 35, 0.75); backdrop-filter: blur(16px);
+  border-radius: 20px; padding: 2rem; position: relative; overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.04); transition: border-color 0.3s, transform 0.3s;
+}
+.card:hover { border-color: rgba(0,200,240,0.12); transform: translateY(-2px); }
+
+.span-2 { grid-column: span 2; }
+.span-3 { grid-column: span 3; }
+.span-4 { grid-column: span 4; }
+
+/* Hero card with wave graphic */
+.hero-card {
+  grid-column: span 4; padding: 4rem 3rem; text-align: center;
+  position: relative; overflow: hidden;
+}
+.hero-waves {
+  position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; opacity: 0.3;
+}
+.hero-waves svg { width: 100%; height: 100%; }
+.hero-card > *:not(.hero-waves) { position: relative; z-index: 1; }
+.hero-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 4px; color: #00c8e0; margin-bottom: 1rem; font-weight: 600; }
+.hero-card h1 { font-family: 'Space Grotesk'; font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; color: #f0f6ff; line-height: 1.15; margin-bottom: 1rem; }
+.hero-card h1 span { background: linear-gradient(135deg, #00d4f0, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-sub { font-size: 1rem; color: rgba(184,200,216,0.6); max-width: 450px; margin: 0 auto; line-height: 1.7; }
+
+.tag { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; color: #00c8e0; font-weight: 600; margin-bottom: 0.8rem; }
+
+.about-card p { font-size: 0.9rem; line-height: 1.75; color: rgba(184,200,216,0.65); }
+.about-card strong { color: #dce8f0; }
+
+.stat-card-bento { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.stat-val { font-family: 'Space Grotesk'; font-size: 2rem; font-weight: 700; color: #00d4f0; }
+.stat-lbl { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: rgba(184,200,216,0.35); margin-top: 0.3rem; }
+
+/* Ocean graphic card - animated jellyfish + coral */
+.ocean-graphic-card {
+  position: relative; overflow: hidden; min-height: 160px;
+  background: linear-gradient(180deg, rgba(6,30,60,0.5), rgba(2,10,20,0.8));
+}
+.ocean-graphic-card svg { width: 100%; height: 100%; position: absolute; inset: 0; }
+
+.quote-card { display: flex; align-items: center; justify-content: center; }
+.quote-card p { font-family: 'Space Grotesk'; font-size: 1rem; font-weight: 500; color: rgba(220,236,244,0.6); text-align: center; font-style: italic; line-height: 1.6; }
+
+.exp-card h3 { font-family: 'Space Grotesk'; font-size: 1.15rem; font-weight: 600; color: #eaf0ff; margin-bottom: 0.2rem; }
+.exp-meta { font-size: 0.8rem; color: #00c8e0; margin-bottom: 0.3rem; }
+.exp-role { font-size: 0.82rem; color: rgba(184,200,216,0.5); margin-bottom: 0.4rem; }
+.exp-desc { font-size: 0.82rem; color: rgba(184,200,216,0.4); line-height: 1.6; }
+
+.hobby-card { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.hobby-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+.hobby-card h3 { font-family: 'Space Grotesk'; font-size: 0.82rem; font-weight: 600; color: #e0ecf4; margin-bottom: 0.2rem; }
+.hobby-card p { font-size: 0.65rem; color: rgba(184,200,216,0.4); line-height: 1.4; }
+
+.contact-card { text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.contact-card p { font-size: 0.9rem; color: rgba(184,200,216,0.5); margin-bottom: 1.2rem; }
+.contact-links { display: flex; gap: 0.8rem; }
+.c-btn { padding: 0.6rem 1.2rem; border-radius: 50px; text-decoration: none; font-size: 0.8rem; font-weight: 500; border: 1px solid rgba(0,200,240,0.15); color: #b8c8d8; transition: all 0.3s; }
+.c-btn:hover { border-color: #00d4f0; color: #00d4f0; }
+
+@media (max-width: 768px) {
+  .bento { grid-template-columns: repeat(2, 1fr); }
+  .span-3, .span-4 { grid-column: span 2; }
+  .hero-card { padding: 3rem 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- Animated underwater background canvas -->
+<canvas id="ocean-canvas"></canvas>
+
+<div class="bento">
+  <!-- Hero with wave svg -->
+  <div class="card hero-card">
+    <div class="hero-waves">
+      <svg viewBox="0 0 800 300" preserveAspectRatio="none">
+        <path fill="rgba(0,180,220,0.06)">
+          <animate attributeName="d" dur="7s" repeatCount="indefinite" values="
+            M0,150 Q200,100 400,150 Q600,200 800,140 L800,300 L0,300 Z;
+            M0,170 Q200,130 400,160 Q600,120 800,170 L800,300 L0,300 Z;
+            M0,150 Q200,100 400,150 Q600,200 800,140 L800,300 L0,300 Z"/>
+        </path>
+        <path fill="rgba(0,120,180,0.04)">
+          <animate attributeName="d" dur="9s" repeatCount="indefinite" values="
+            M0,180 Q200,140 400,180 Q600,160 800,190 L800,300 L0,300 Z;
+            M0,190 Q200,170 400,160 Q600,190 800,170 L800,300 L0,300 Z;
+            M0,180 Q200,140 400,180 Q600,160 800,190 L800,300 L0,300 Z"/>
+        </path>
+      </svg>
+    </div>
+    <div class="hero-label">Hey, I'm</div>
+    <h1>Alexandra <span>Garibaldi</span></h1>
+    <p class="hero-sub">Software Engineer at Amazon in NYC.<br>Building by day. Diving, dancing, and exploring by night.</p>
+  </div>
+
+  <!-- About -->
+  <div class="card span-2 about-card">
+    <div class="tag">About</div>
+    <p>I'm a software engineer who believes life is too short for just one hobby. After graduating from West Chester University with a <strong>4.0 GPA</strong> on a full-tuition scholarship, I moved to NYC and joined <strong>Amazon</strong>.</p>
+  </div>
+
+  <div class="card stat-card-bento"><span class="stat-val">4.0</span><span class="stat-lbl">GPA</span></div>
+  <div class="card stat-card-bento"><span class="stat-val">NYC</span><span class="stat-lbl">Based</span></div>
+
+  <!-- Ocean graphic: jellyfish scene -->
+  <div class="card span-2 ocean-graphic-card">
+    <svg viewBox="0 0 400 160">
+      <!-- Water gradient -->
+      <defs>
+        <radialGradient id="jglow1" cx="50%" cy="50%"><stop offset="0%" stop-color="rgba(255,105,180,0.3)"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+        <radialGradient id="jglow2" cx="50%" cy="50%"><stop offset="0%" stop-color="rgba(0,229,255,0.25)"/><stop offset="100%" stop-color="transparent"/></radialGradient>
+      </defs>
+      <!-- Jellyfish 1 -->
+      <g>
+        <ellipse cx="100" cy="55" rx="25" ry="18" fill="rgba(255,105,180,0.3)" stroke="rgba(255,105,180,0.4)" stroke-width="1">
+          <animate attributeName="ry" values="18;20;18" dur="2.5s" repeatCount="indefinite"/>
+          <animate attributeName="rx" values="25;23;25" dur="2.5s" repeatCount="indefinite"/>
+        </ellipse>
+        <circle cx="100" cy="55" r="35" fill="url(#jglow1)"/>
+        <line x1="85" y1="72" x2="83" y2="110" stroke="rgba(255,105,180,0.2)" stroke-width="1.5">
+          <animate attributeName="x2" values="83;87;83" dur="3s" repeatCount="indefinite"/>
+        </line>
+        <line x1="95" y1="72" x2="93" y2="120" stroke="rgba(255,105,180,0.15)" stroke-width="1">
+          <animate attributeName="x2" values="93;97;93" dur="3.5s" repeatCount="indefinite"/>
+        </line>
+        <line x1="105" y1="72" x2="107" y2="115" stroke="rgba(255,105,180,0.2)" stroke-width="1.5">
+          <animate attributeName="x2" values="107;103;107" dur="2.8s" repeatCount="indefinite"/>
+        </line>
+        <line x1="115" y1="72" x2="117" y2="105" stroke="rgba(255,105,180,0.15)" stroke-width="1">
+          <animate attributeName="x2" values="117;113;117" dur="3.2s" repeatCount="indefinite"/>
+        </line>
+        <animateTransform attributeName="transform" type="translate" values="0,0; 5,-8; 0,0" dur="6s" repeatCount="indefinite"/>
+      </g>
+      <!-- Jellyfish 2 (smaller) -->
+      <g>
+        <ellipse cx="290" cy="70" rx="18" ry="13" fill="rgba(0,229,255,0.25)" stroke="rgba(0,229,255,0.3)" stroke-width="1">
+          <animate attributeName="ry" values="13;15;13" dur="3s" repeatCount="indefinite"/>
+          <animate attributeName="rx" values="18;16;18" dur="3s" repeatCount="indefinite"/>
+        </ellipse>
+        <circle cx="290" cy="70" r="28" fill="url(#jglow2)"/>
+        <line x1="280" y1="82" x2="278" y2="110" stroke="rgba(0,229,255,0.15)" stroke-width="1">
+          <animate attributeName="x2" values="278;282;278" dur="3.3s" repeatCount="indefinite"/>
+        </line>
+        <line x1="290" y1="82" x2="292" y2="120" stroke="rgba(0,229,255,0.12)" stroke-width="1">
+          <animate attributeName="x2" values="292;288;292" dur="3.7s" repeatCount="indefinite"/>
+        </line>
+        <line x1="300" y1="82" x2="302" y2="108" stroke="rgba(0,229,255,0.15)" stroke-width="1">
+          <animate attributeName="x2" values="302;298;302" dur="2.9s" repeatCount="indefinite"/>
+        </line>
+        <animateTransform attributeName="transform" type="translate" values="0,0; -4,-6; 0,0" dur="8s" repeatCount="indefinite"/>
+      </g>
+      <!-- Bubbles -->
+      <circle cx="60" cy="130" r="2" fill="rgba(0,200,240,0.2)"><animate attributeName="cy" values="130;20" dur="8s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.3;0" dur="8s" repeatCount="indefinite"/></circle>
+      <circle cx="200" cy="140" r="1.5" fill="rgba(0,200,240,0.15)"><animate attributeName="cy" values="140;30" dur="10s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.25;0" dur="10s" repeatCount="indefinite"/></circle>
+      <circle cx="340" cy="145" r="2.5" fill="rgba(0,200,240,0.2)"><animate attributeName="cy" values="145;15" dur="9s" repeatCount="indefinite"/><animate attributeName="opacity" values="0.3;0" dur="9s" repeatCount="indefinite"/></circle>
+    </svg>
+  </div>
+
+  <div class="card stat-card-bento"><span class="stat-val">PADI</span><span class="stat-lbl">Certified</span></div>
+  <div class="card stat-card-bento"><span class="stat-val">8+</span><span class="stat-lbl">Hobbies</span></div>
+
+  <!-- Experience -->
+  <div class="card span-2 exp-card">
+    <div class="tag">Experience</div>
+    <h3>Amazon</h3><p class="exp-meta">Present</p><p class="exp-role">Software Engineer · NYC</p>
+    <p class="exp-desc">Building scalable, high-impact systems. Shipping features that serve millions of users globally.</p>
+  </div>
+  <div class="card span-2 exp-card">
+    <div class="tag">Education</div>
+    <h3>West Chester University</h3><p class="exp-meta">2017 – 2021</p><p class="exp-role">B.S. Computer Science · 4.0 Major GPA</p>
+    <p class="exp-desc">Board of Governor's Full Tuition Scholar. Honors College. Dean's List.</p>
+  </div>
+
+  <!-- Hobbies -->
+  <div class="card hobby-card"><div class="hobby-icon">🤿</div><h3>Scuba Diving</h3><p>PADI certified. Reefs at depth.</p></div>
+  <div class="card hobby-card"><div class="hobby-icon">⛷️</div><h3>Skiing</h3><p>Powder days, mountain views.</p></div>
+  <div class="card hobby-card"><div class="hobby-icon">💃</div><h3>Hip Hop Dance</h3><p>Rhythm on the floor.</p></div>
+  <div class="card hobby-card"><div class="hobby-icon">🏑</div><h3>Field Hockey</h3><p>Speed and strategy.</p></div>
+  <div class="card hobby-card"><div class="hobby-icon">🎹</div><h3>Piano</h3><p>Classical roots, improv soul.</p></div>
+  <div class="card hobby-card"><div class="hobby-icon">📚</div><h3>Reading</h3><p>Always have a book going.</p></div>
+  <div class="card hobby-card"><div class="hobby-icon">🎶</div><h3>EDM & Festivals</h3><p>Bass drops, lasers, energy.</p></div>
+  <div class="card hobby-card"><div class="hobby-icon">🌊</div><h3>Ocean Life</h3><p>Fascinated by the deep.</p></div>
+
+  <!-- Contact -->
+  <div class="card span-4 contact-card">
+    <div class="tag">Let's Connect</div>
+    <p>Whether it's about code, the ocean, or the next festival — I'd love to hear from you.</p>
+    <div class="contact-links">
+      <a href="https://github.com/aygaribaldi" class="c-btn" target="_blank">GitHub</a>
+      <a href="https://linkedin.com/in/alexandra-garibaldi" class="c-btn" target="_blank">LinkedIn</a>
+    </div>
+  </div>
+</div>
+
+<script>
+// Canvas underwater scene - bubbles, light rays, particles
+const canvas = document.getElementById('ocean-canvas');
+const ctx = canvas.getContext('2d');
+let w, h;
+function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+const bubbles = Array.from({length: 40}, () => ({
+  x: Math.random() * w, y: Math.random() * h,
+  r: 1 + Math.random() * 4, speed: 0.2 + Math.random() * 0.6,
+  wobble: Math.random() * Math.PI * 2
+}));
+
+const rays = Array.from({length: 5}, (_, i) => ({
+  x: w * 0.15 + (i * w * 0.18), width: 15 + Math.random() * 25,
+  speed: 0.3 + Math.random() * 0.3, phase: Math.random() * Math.PI * 2
+}));
+
+function draw(t) {
+  ctx.clearRect(0, 0, w, h);
+
+  // Light rays
+  rays.forEach(r => {
+    const sway = Math.sin(t * 0.001 * r.speed + r.phase) * 30;
+    const grad = ctx.createLinearGradient(r.x + sway, 0, r.x + sway + r.width, h);
+    grad.addColorStop(0, 'rgba(0,180,220,0.04)');
+    grad.addColorStop(0.5, 'rgba(0,180,220,0.015)');
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.moveTo(r.x + sway, 0);
+    ctx.lineTo(r.x + sway + r.width, 0);
+    ctx.lineTo(r.x + sway + r.width + 40, h);
+    ctx.lineTo(r.x + sway - 20, h);
+    ctx.fill();
+  });
+
+  // Bubbles
+  bubbles.forEach(b => {
+    b.y -= b.speed;
+    b.x += Math.sin(t * 0.002 + b.wobble) * 0.3;
+    if (b.y < -10) { b.y = h + 10; b.x = Math.random() * w; }
+
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0, 200, 240, ${0.08 + b.r * 0.02})`;
+    ctx.fill();
+    ctx.strokeStyle = `rgba(0, 220, 255, ${0.05 + b.r * 0.01})`;
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  });
+
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+</script>
+</body>
+</html>

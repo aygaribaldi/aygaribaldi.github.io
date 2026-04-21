@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prototype 1 — Illustrated Ocean</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; background: #060e1a; color: #b8c8d8; overflow-x: hidden; }
+
+/* ── Animated SVG ocean surface ── */
+.ocean-surface {
+  position: absolute; top: 0; left: 0; width: 100%; height: 220px;
+  overflow: hidden; z-index: 1; pointer-events: none;
+}
+.ocean-surface svg { width: 200%; height: 100%; animation: wave-drift 8s linear infinite; }
+@keyframes wave-drift { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+/* ── Bubble particles ── */
+.bubbles { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.bubble {
+  position: absolute; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(0, 220, 255, 0.25), rgba(0, 180, 240, 0.05));
+  border: 1px solid rgba(0, 220, 255, 0.1);
+  animation: rise linear infinite;
+}
+@keyframes rise {
+  0% { transform: translateY(100vh) translateX(0) scale(0.5); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(-10vh) translateX(30px) scale(1); opacity: 0; }
+}
+
+/* ── Floating jellyfish (CSS-only) ── */
+.jellyfish-container { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.jellyfish {
+  position: absolute; width: 60px; height: 80px; opacity: 0.15;
+  animation: jelly-float 12s ease-in-out infinite;
+}
+.jellyfish .bell {
+  width: 60px; height: 40px; border-radius: 50% 50% 40% 40%;
+  background: radial-gradient(ellipse at 50% 30%, rgba(255, 105, 180, 0.6), rgba(168, 85, 247, 0.3));
+  animation: pulse 3s ease-in-out infinite;
+}
+.jellyfish .tentacles {
+  display: flex; justify-content: center; gap: 4px; padding-top: 2px;
+}
+.jellyfish .tentacle {
+  width: 2px; height: 35px; border-radius: 0 0 2px 2px;
+  background: linear-gradient(to bottom, rgba(255, 105, 180, 0.4), transparent);
+  animation: sway 2.5s ease-in-out infinite;
+  transform-origin: top center;
+}
+.jellyfish .tentacle:nth-child(2) { height: 42px; animation-delay: -0.3s; }
+.jellyfish .tentacle:nth-child(3) { height: 30px; animation-delay: -0.7s; }
+.jellyfish .tentacle:nth-child(4) { height: 38px; animation-delay: -1s; }
+.jellyfish .tentacle:nth-child(5) { height: 28px; animation-delay: -0.5s; }
+@keyframes jelly-float {
+  0%, 100% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-30px) translateX(15px); }
+  50% { transform: translateY(-10px) translateX(-10px); }
+  75% { transform: translateY(-40px) translateX(5px); }
+}
+@keyframes pulse {
+  0%, 100% { transform: scaleX(1) scaleY(1); }
+  50% { transform: scaleX(0.9) scaleY(1.1); }
+}
+@keyframes sway {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(8deg); }
+}
+
+/* ── Fish silhouettes ── */
+.fish-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.fish-school {
+  position: absolute; display: flex; gap: 15px; opacity: 0.08;
+  animation: swim 20s linear infinite;
+}
+.fish-school svg { width: 30px; height: 18px; fill: #00d4f0; }
+@keyframes swim {
+  0% { transform: translateX(-200px); }
+  100% { transform: translateX(calc(100vw + 200px)); }
+}
+
+/* ── Coral footer decoration ── */
+.coral-decoration {
+  position: relative; width: 100%; height: 120px; overflow: hidden; margin-top: -60px;
+  pointer-events: none;
+}
+.coral-decoration svg { position: absolute; bottom: 0; width: 100%; height: 120px; }
+
+/* ── Nav ── */
+nav {
+  position: fixed; top: 0; width: 100%; padding: 1.2rem 3rem;
+  display: flex; justify-content: space-between; align-items: center;
+  backdrop-filter: blur(20px); background: rgba(6, 14, 26, 0.75);
+  border-bottom: 1px solid rgba(0, 200, 240, 0.06); z-index: 100;
+}
+.nav-logo { font-family: 'Space Grotesk'; font-weight: 700; font-size: 1.1rem; color: #e8f4ff; }
+.nav-links { display: flex; gap: 2rem; list-style: none; }
+.nav-links a { color: rgba(184,200,216,0.5); text-decoration: none; font-size: 0.82rem; font-weight: 500; transition: color 0.3s; }
+.nav-links a:hover { color: #00d4f0; }
+
+/* ── Sections ── */
+section { min-height: 100vh; display: flex; align-items: center; padding: 6rem 3rem; position: relative; z-index: 2; }
+
+.hero {
+  justify-content: center; text-align: center; flex-direction: column;
+  padding-top: 250px;
+}
+.hero-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 4px; color: #00c8e0; margin-bottom: 1.5rem; font-weight: 600; }
+.hero h1 { font-family: 'Space Grotesk'; font-size: clamp(3rem, 7vw, 5.5rem); font-weight: 700; color: #eaf4ff; line-height: 1.1; margin-bottom: 1.5rem; }
+.hero h1 span { background: linear-gradient(135deg, #00d4f0, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-sub { font-size: 1.1rem; color: rgba(184,200,216,0.6); max-width: 500px; margin: 0 auto 3rem; line-height: 1.7; }
+.scroll-cue { color: rgba(0,200,240,0.4); font-size: 0.75rem; letter-spacing: 2px; text-transform: uppercase; }
+.scroll-cue span { display: block; animation: bounce 2s ease infinite; margin-top: 0.4rem; font-size: 1.2rem; }
+@keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
+
+/* ── Content sections ── */
+.section-tag { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 3px; color: #00c8e0; font-weight: 600; margin-bottom: 0.8rem; }
+.section-title { font-family: 'Space Grotesk'; font-size: 2.2rem; font-weight: 700; color: #eaf4ff; margin-bottom: 1.5rem; }
+.section-title span { color: #00d4f0; }
+
+.about { max-width: 900px; margin: 0 auto; }
+.about p { font-size: 0.95rem; line-height: 1.8; color: rgba(184,200,216,0.65); margin-bottom: 0.8rem; }
+.about strong { color: #dce8f0; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 2rem; }
+.stat-card { text-align: center; padding: 1.2rem 0.5rem; border: 1px solid rgba(0,200,240,0.08); border-radius: 16px; background: rgba(0,200,240,0.03); }
+.stat-card .val { font-family: 'Space Grotesk'; font-size: 1.4rem; font-weight: 700; color: #00d4f0; display: block; }
+.stat-card .lbl { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 1px; color: rgba(184,200,216,0.35); }
+
+.exp-section { flex-direction: column; max-width: 700px; margin: 0 auto; }
+.exp-item { padding: 2rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.exp-item:last-child { border-bottom: none; }
+.exp-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.2rem; }
+.exp-top h3 { font-family: 'Space Grotesk'; font-size: 1.2rem; font-weight: 600; color: #eaf0ff; }
+.exp-date { font-size: 0.8rem; color: #00c8e0; }
+.exp-role { font-size: 0.85rem; color: rgba(184,200,216,0.5); margin-bottom: 0.4rem; }
+.exp-desc { font-size: 0.85rem; color: rgba(184,200,216,0.4); line-height: 1.6; }
+
+.hobbies-section { flex-direction: column; max-width: 800px; margin: 0 auto; }
+.hobbies-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-top: 1rem; }
+.hobby { text-align: center; padding: 1.5rem 0.8rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.04); background: rgba(0,200,240,0.02); transition: all 0.3s; }
+.hobby:hover { border-color: rgba(0,200,240,0.12); transform: translateY(-4px); }
+.hobby-icon { font-size: 2rem; margin-bottom: 0.6rem; }
+.hobby h3 { font-family: 'Space Grotesk'; font-size: 0.82rem; font-weight: 600; color: #e0ecf4; margin-bottom: 0.2rem; }
+.hobby p { font-size: 0.68rem; color: rgba(184,200,216,0.4); line-height: 1.4; }
+
+.contact { flex-direction: column; text-align: center; justify-content: center; }
+.contact p { font-size: 0.95rem; color: rgba(184,200,216,0.5); max-width: 400px; margin: 0 auto 2rem; }
+.contact-btns { display: flex; gap: 1rem; justify-content: center; }
+.btn { padding: 0.8rem 1.5rem; border-radius: 50px; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.3s; border: 1px solid rgba(0,200,240,0.2); color: #b8c8d8; }
+.btn:hover { border-color: #00d4f0; color: #00d4f0; box-shadow: 0 0 25px rgba(0,200,240,0.15); }
+
+@media (max-width: 768px) {
+  section { padding: 4rem 1.5rem; }
+  .stats { grid-template-columns: repeat(2, 1fr); }
+  .hobbies-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<!-- Animated ocean surface waves -->
+<div class="ocean-surface">
+  <svg viewBox="0 0 1440 220" preserveAspectRatio="none">
+    <defs>
+      <linearGradient id="wg1" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="rgba(0,180,220,0.15)"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </linearGradient>
+      <linearGradient id="wg2" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="rgba(0,120,180,0.1)"/>
+        <stop offset="100%" stop-color="transparent"/>
+      </linearGradient>
+    </defs>
+    <path fill="url(#wg1)">
+      <animate attributeName="d" dur="6s" repeatCount="indefinite" values="
+        M0,80 C180,40 360,100 540,70 C720,40 900,110 1080,60 C1260,30 1440,90 1440,80 L1440,0 L0,0 Z;
+        M0,90 C180,60 360,80 540,100 C720,70 900,50 1080,90 C1260,60 1440,70 1440,90 L1440,0 L0,0 Z;
+        M0,80 C180,40 360,100 540,70 C720,40 900,110 1080,60 C1260,30 1440,90 1440,80 L1440,0 L0,0 Z
+      "/>
+    </path>
+    <path fill="url(#wg2)">
+      <animate attributeName="d" dur="8s" repeatCount="indefinite" values="
+        M0,100 C200,70 400,120 600,80 C800,50 1000,100 1200,70 C1400,50 1440,90 1440,100 L1440,0 L0,0 Z;
+        M0,110 C200,90 400,60 600,100 C800,80 1000,60 1200,100 C1400,70 1440,80 1440,110 L1440,0 L0,0 Z;
+        M0,100 C200,70 400,120 600,80 C800,50 1000,100 1200,70 C1400,50 1440,90 1440,100 L1440,0 L0,0 Z
+      "/>
+    </path>
+    <!-- Sun rays through water -->
+    <line x1="350" y1="0" x2="380" y2="220" stroke="rgba(0,200,240,0.06)" stroke-width="20">
+      <animate attributeName="x1" values="350;370;350" dur="5s" repeatCount="indefinite"/>
+    </line>
+    <line x1="700" y1="0" x2="720" y2="220" stroke="rgba(0,200,240,0.04)" stroke-width="30">
+      <animate attributeName="x1" values="700;680;700" dur="7s" repeatCount="indefinite"/>
+    </line>
+    <line x1="1050" y1="0" x2="1080" y2="220" stroke="rgba(0,200,240,0.05)" stroke-width="15">
+      <animate attributeName="x1" values="1050;1070;1050" dur="6s" repeatCount="indefinite"/>
+    </line>
+  </svg>
+</div>
+
+<!-- Bubbles -->
+<div class="bubbles" id="bubbles"></div>
+
+<!-- Jellyfish -->
+<div class="jellyfish-container">
+  <div class="jellyfish" style="left: 8%; top: 35%; animation-delay: -2s; opacity: 0.12;">
+    <div class="bell"></div>
+    <div class="tentacles"><div class="tentacle"></div><div class="tentacle"></div><div class="tentacle"></div><div class="tentacle"></div><div class="tentacle"></div></div>
+  </div>
+  <div class="jellyfish" style="right: 12%; top: 55%; animation-delay: -5s; animation-duration: 15s; transform: scale(0.7); opacity: 0.08;">
+    <div class="bell"></div>
+    <div class="tentacles"><div class="tentacle"></div><div class="tentacle"></div><div class="tentacle"></div><div class="tentacle"></div><div class="tentacle"></div></div>
+  </div>
+  <div class="jellyfish" style="left: 60%; top: 70%; animation-delay: -8s; animation-duration: 18s; transform: scale(1.2); opacity: 0.1;">
+    <div class="bell"></div>
+    <div class="tentacles"><div class="tentacle"></div><div class="tentacle"></div><div class="tentacle"></div><div class="tentacle"></div><div class="tentacle"></div></div>
+  </div>
+</div>
+
+<!-- Fish -->
+<div class="fish-layer">
+  <div class="fish-school" style="top: 30%; animation-duration: 18s; animation-delay: -3s;">
+    <svg viewBox="0 0 30 18"><path d="M0,9 Q8,0 15,9 Q8,18 0,9 Z M15,9 L22,4 L22,14 Z"/></svg>
+    <svg viewBox="0 0 30 18"><path d="M0,9 Q8,0 15,9 Q8,18 0,9 Z M15,9 L22,4 L22,14 Z"/></svg>
+    <svg viewBox="0 0 30 18"><path d="M0,9 Q8,0 15,9 Q8,18 0,9 Z M15,9 L22,4 L22,14 Z"/></svg>
+    <svg viewBox="0 0 30 18"><path d="M0,9 Q8,0 15,9 Q8,18 0,9 Z M15,9 L22,4 L22,14 Z"/></svg>
+    <svg viewBox="0 0 30 18"><path d="M0,9 Q8,0 15,9 Q8,18 0,9 Z M15,9 L22,4 L22,14 Z"/></svg>
+  </div>
+  <div class="fish-school" style="top: 60%; animation-duration: 25s; animation-delay: -10s; opacity: 0.05;">
+    <svg viewBox="0 0 30 18"><path d="M0,9 Q8,0 15,9 Q8,18 0,9 Z M15,9 L22,4 L22,14 Z"/></svg>
+    <svg viewBox="0 0 30 18"><path d="M0,9 Q8,0 15,9 Q8,18 0,9 Z M15,9 L22,4 L22,14 Z"/></svg>
+    <svg viewBox="0 0 30 18"><path d="M0,9 Q8,0 15,9 Q8,18 0,9 Z M15,9 L22,4 L22,14 Z"/></svg>
+  </div>
+</div>
+
+<nav>
+  <div class="nav-logo">AG</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#life">Life</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<section class="hero">
+  <div class="hero-label">Hey, I'm</div>
+  <h1>Alexandra<br><span>Garibaldi</span></h1>
+  <p class="hero-sub">Software Engineer at Amazon in NYC.<br>Building by day. Diving, dancing, and exploring by night.</p>
+  <div class="scroll-cue">scroll to dive deeper<span>&#8595;</span></div>
+</section>
+
+<section id="about" class="about">
+  <div>
+    <div class="section-tag">About</div>
+    <h2 class="section-title">Engineer. Diver. <span>Explorer.</span></h2>
+    <p>I'm a software engineer who believes life is too short for just one hobby. After graduating from West Chester University with a <strong>4.0 GPA</strong> in Computer Science on a full-tuition scholarship, I moved to NYC and joined <strong>Amazon</strong>.</p>
+    <p>I'm a PADI-certified scuba diver, a hip hop dancer, a skier, a field hockey player, a pianist, an avid reader, and a festival regular.</p>
+    <div class="stats">
+      <div class="stat-card"><span class="val">4.0</span><span class="lbl">GPA</span></div>
+      <div class="stat-card"><span class="val">NYC</span><span class="lbl">Based</span></div>
+      <div class="stat-card"><span class="val">PADI</span><span class="lbl">Certified</span></div>
+      <div class="stat-card"><span class="val">8+</span><span class="lbl">Hobbies</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="experience" class="exp-section">
+  <div class="section-tag">Experience</div>
+  <h2 class="section-title">Where I've <span>Built</span></h2>
+  <div class="exp-item">
+    <div class="exp-top"><h3>Amazon</h3><span class="exp-date">Present</span></div>
+    <p class="exp-role">Software Engineer · NYC</p>
+    <p class="exp-desc">Building scalable, high-impact systems. Shipping features that serve millions of users globally.</p>
+  </div>
+  <div class="exp-item">
+    <div class="exp-top"><h3>West Chester University</h3><span class="exp-date">2017 – 2021</span></div>
+    <p class="exp-role">B.S. Computer Science · 4.0 Major GPA</p>
+    <p class="exp-desc">Board of Governor's Full Tuition Scholar. Honors College. Dean's List. "Repair the World" CS Scholarship recipient.</p>
+  </div>
+</section>
+
+<!-- Coral reef divider -->
+<div class="coral-decoration">
+  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <!-- Coral branches -->
+    <g fill="none" stroke-linecap="round">
+      <path d="M100,120 Q100,70 110,50 Q115,40 108,25" stroke="rgba(255,107,107,0.3)" stroke-width="6"/>
+      <path d="M100,120 Q105,80 120,60 Q128,48 125,35" stroke="rgba(255,107,107,0.2)" stroke-width="4"/>
+      <path d="M250,120 Q250,85 245,65 Q242,50 248,35 Q252,25 248,15" stroke="rgba(232,89,74,0.3)" stroke-width="7"/>
+      <path d="M250,120 Q255,90 265,70 Q270,55 268,40" stroke="rgba(232,89,74,0.2)" stroke-width="4"/>
+      <path d="M400,120 Q398,90 405,75 Q410,60 404,45" stroke="rgba(255,138,92,0.25)" stroke-width="5"/>
+      <path d="M550,120 Q548,80 555,60 Q560,45 553,30 Q548,20 552,10" stroke="rgba(255,71,87,0.3)" stroke-width="8"/>
+      <path d="M550,120 Q555,85 565,65 Q572,50 568,38" stroke="rgba(255,71,87,0.2)" stroke-width="4"/>
+      <path d="M700,120 Q700,95 695,80 Q690,65 696,50" stroke="rgba(200,91,57,0.25)" stroke-width="5"/>
+      <path d="M850,120 Q852,75 847,55 Q843,40 848,25" stroke="rgba(255,107,107,0.3)" stroke-width="6"/>
+      <path d="M850,120 Q856,85 862,68 Q866,55 860,42" stroke="rgba(255,107,107,0.2)" stroke-width="4"/>
+      <path d="M1000,120 Q998,90 1005,72 Q1010,58 1003,42 Q998,30 1004,18" stroke="rgba(238,90,36,0.3)" stroke-width="7"/>
+      <path d="M1150,120 Q1148,85 1155,65 Q1160,50 1152,35" stroke="rgba(255,160,122,0.25)" stroke-width="5"/>
+      <path d="M1300,120 Q1302,80 1295,58 Q1290,42 1297,28" stroke="rgba(255,138,92,0.3)" stroke-width="6"/>
+    </g>
+    <!-- Sea plants (green swaying) -->
+    <g fill="none" stroke-linecap="round">
+      <path d="M170,120 Q168,90 175,70 Q180,55 172,40" stroke="rgba(46,204,113,0.2)" stroke-width="3">
+        <animate attributeName="d" dur="4s" repeatCount="indefinite" values="
+          M170,120 Q168,90 175,70 Q180,55 172,40;
+          M170,120 Q172,90 178,70 Q182,55 176,40;
+          M170,120 Q168,90 175,70 Q180,55 172,40"/>
+      </path>
+      <path d="M475,120 Q473,95 478,80 Q482,68 476,55" stroke="rgba(26,188,156,0.2)" stroke-width="3">
+        <animate attributeName="d" dur="5s" repeatCount="indefinite" values="
+          M475,120 Q473,95 478,80 Q482,68 476,55;
+          M475,120 Q477,95 482,80 Q486,68 480,55;
+          M475,120 Q473,95 478,80 Q482,68 476,55"/>
+      </path>
+      <path d="M780,120 Q778,92 783,75 Q787,62 781,48" stroke="rgba(46,204,113,0.2)" stroke-width="3">
+        <animate attributeName="d" dur="4.5s" repeatCount="indefinite" values="
+          M780,120 Q778,92 783,75 Q787,62 781,48;
+          M780,120 Q782,92 787,75 Q791,62 785,48;
+          M780,120 Q778,92 783,75 Q787,62 781,48"/>
+      </path>
+      <path d="M1080,120 Q1078,88 1084,70 Q1088,55 1082,40" stroke="rgba(22,160,133,0.2)" stroke-width="3">
+        <animate attributeName="d" dur="5.5s" repeatCount="indefinite" values="
+          M1080,120 Q1078,88 1084,70 Q1088,55 1082,40;
+          M1080,120 Q1082,88 1088,70 Q1092,55 1086,40;
+          M1080,120 Q1078,88 1084,70 Q1088,55 1082,40"/>
+      </path>
+    </g>
+    <!-- Anemone dots -->
+    <circle cx="320" cy="115" r="5" fill="rgba(255,107,157,0.2)"><animate attributeName="r" values="5;6;5" dur="3s" repeatCount="indefinite"/></circle>
+    <circle cx="325" cy="108" r="4" fill="rgba(255,107,157,0.15)"><animate attributeName="r" values="4;5;4" dur="3.5s" repeatCount="indefinite"/></circle>
+    <circle cx="630" cy="112" r="5" fill="rgba(196,77,255,0.2)"><animate attributeName="r" values="5;6.5;5" dur="2.8s" repeatCount="indefinite"/></circle>
+    <circle cx="937" cy="114" r="4.5" fill="rgba(255,192,72,0.2)"><animate attributeName="r" values="4.5;5.5;4.5" dur="3.2s" repeatCount="indefinite"/></circle>
+    <!-- Sandy floor -->
+    <rect x="0" y="115" width="1440" height="5" fill="rgba(196,168,107,0.08)"/>
+  </svg>
+</div>
+
+<section id="life" class="hobbies-section">
+  <div class="section-tag">A Rich Life</div>
+  <h2 class="section-title">I collect hobbies like they're<br><span>going out of style.</span></h2>
+  <div class="hobbies-grid">
+    <div class="hobby"><div class="hobby-icon">🤿</div><h3>Scuba Diving</h3><p>PADI certified. Happiest at depth.</p></div>
+    <div class="hobby"><div class="hobby-icon">⛷️</div><h3>Skiing</h3><p>Powder days, mountain views.</p></div>
+    <div class="hobby"><div class="hobby-icon">💃</div><h3>Hip Hop Dance</h3><p>Rhythm on the dance floor.</p></div>
+    <div class="hobby"><div class="hobby-icon">🏑</div><h3>Field Hockey</h3><p>Speed, strategy, fire.</p></div>
+    <div class="hobby"><div class="hobby-icon">🎹</div><h3>Piano</h3><p>Classical roots, improv soul.</p></div>
+    <div class="hobby"><div class="hobby-icon">📚</div><h3>Reading</h3><p>Always have a book going.</p></div>
+    <div class="hobby"><div class="hobby-icon">🎶</div><h3>EDM & Festivals</h3><p>Bass drops, lasers, energy.</p></div>
+    <div class="hobby"><div class="hobby-icon">🌊</div><h3>Ocean Life</h3><p>Fascinated by the deep.</p></div>
+  </div>
+</section>
+
+<section id="contact" class="contact">
+  <div class="section-tag">Let's Connect</div>
+  <h2 class="section-title"><span>Say Hello</span></h2>
+  <p>Whether it's about code, the ocean, or the next festival — I'd love to hear from you.</p>
+  <div class="contact-btns">
+    <a href="https://github.com/aygaribaldi" class="btn" target="_blank">GitHub</a>
+    <a href="https://linkedin.com/in/alexandra-garibaldi" class="btn" target="_blank">LinkedIn</a>
+  </div>
+</section>
+
+<script>
+const bubbles = document.getElementById('bubbles');
+for (let i = 0; i < 25; i++) {
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  const size = 4 + Math.random() * 14;
+  b.style.width = b.style.height = size + 'px';
+  b.style.left = Math.random() * 100 + '%';
+  b.style.animationDuration = (10 + Math.random() * 15) + 's';
+  b.style.animationDelay = (-Math.random() * 20) + 's';
+  bubbles.appendChild(b);
+}
+</script>
+</body>
+</html>

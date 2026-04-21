@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Prototype 3 — Depth Dive Storytelling</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { font-family: 'Inter', sans-serif; background: #060e1a; color: #b0c4d4; overflow-x: hidden; }
+
+/* Full-screen canvas for animated underwater scene */
+canvas#scene { position: fixed; inset: 0; z-index: 0; }
+
+/* Depth color overlay that shifts as you scroll */
+.depth-overlay {
+  position: fixed; inset: 0; z-index: 1; pointer-events: none;
+  transition: background 0.5s;
+}
+
+/* Progress */
+.progress-line { position: fixed; left: 2rem; top: 0; width: 2px; height: 100vh; z-index: 50; }
+.progress-track { width: 100%; height: 100%; background: rgba(0,200,240,0.08); }
+.progress-fill { width: 100%; background: linear-gradient(180deg, #00c8e0, #a855f7); transition: height 0.1s; }
+
+/* Depth label */
+.depth-label-fixed {
+  position: fixed; right: 2rem; bottom: 2rem; z-index: 50;
+  font-family: 'Space Grotesk'; font-size: 0.7rem; letter-spacing: 2px;
+  color: rgba(0,200,240,0.4); text-transform: uppercase;
+}
+
+section {
+  min-height: 100vh; display: flex; align-items: center; padding: 6rem 4rem 6rem 5rem;
+  position: relative; z-index: 2;
+  opacity: 0; transform: translateY(40px); transition: opacity 0.8s, transform 0.8s;
+}
+section.visible { opacity: 1; transform: translateY(0); }
+
+.content { max-width: 550px; }
+
+.section-num { font-family: 'Space Grotesk'; font-size: 0.7rem; color: rgba(0,200,240,0.4); letter-spacing: 3px; margin-bottom: 1rem; font-weight: 600; }
+.section-heading { font-family: 'Space Grotesk'; font-size: clamp(2rem, 4vw, 3rem); font-weight: 700; color: #eaf4ff; line-height: 1.2; margin-bottom: 1.5rem; }
+.section-heading span { background: linear-gradient(135deg, #00d4f0, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+.hero { justify-content: center; text-align: center; padding: 0 2rem; }
+.hero .content { max-width: 700px; }
+.hero-greeting { font-size: 0.85rem; text-transform: uppercase; letter-spacing: 4px; color: #00c8e0; margin-bottom: 1rem; font-weight: 600; }
+.hero h1 { font-family: 'Space Grotesk'; font-size: clamp(3rem, 7vw, 5.5rem); font-weight: 800; color: #f0f6ff; line-height: 1.1; margin-bottom: 1.5rem; }
+.hero h1 span { background: linear-gradient(135deg, #00d4f0, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.hero-tagline { font-size: 1.1rem; color: rgba(176,196,212,0.65); line-height: 1.7; margin-bottom: 2.5rem; }
+.depth-hint { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 3px; color: rgba(0,200,240,0.35); animation: pulse-glow 3s ease infinite; }
+@keyframes pulse-glow { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+
+.section-right { justify-content: flex-end; }
+.section-right .content { text-align: right; }
+
+p.body { font-size: 0.95rem; line-height: 1.8; color: rgba(176,196,212,0.6); margin-bottom: 1rem; }
+p.body strong { color: #dce8f0; }
+
+.stats-inline { display: flex; gap: 1.5rem; margin-top: 1.5rem; }
+.section-right .stats-inline { justify-content: flex-end; }
+.stat-pill { padding: 0.6rem 1.2rem; border-radius: 50px; border: 1px solid rgba(0,200,240,0.1); background: rgba(0,200,240,0.03); display: flex; gap: 0.5rem; align-items: baseline; }
+.stat-pill .val { font-family: 'Space Grotesk'; font-weight: 700; color: #00d4f0; font-size: 0.95rem; }
+.stat-pill .lbl { font-size: 0.7rem; color: rgba(176,196,212,0.4); text-transform: uppercase; letter-spacing: 1px; }
+
+.exp-item { padding: 1.5rem 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+.exp-item:last-child { border-bottom: none; }
+.exp-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.3rem; }
+.section-right .exp-top { flex-direction: row-reverse; }
+.exp-top h3 { font-family: 'Space Grotesk'; font-size: 1.2rem; font-weight: 600; color: #eaf0ff; }
+.exp-date { font-size: 0.75rem; color: #00c8e0; }
+.exp-role { font-size: 0.85rem; color: rgba(176,196,212,0.5); margin-bottom: 0.4rem; }
+.exp-desc { font-size: 0.85rem; color: rgba(176,196,212,0.4); line-height: 1.6; }
+
+.hobby-flow { display: flex; flex-wrap: wrap; gap: 0.8rem; margin-top: 1rem; }
+.hobby-tag { padding: 0.6rem 1.2rem; border-radius: 50px; border: 1px solid rgba(255,255,255,0.06); background: rgba(0,200,240,0.02); font-size: 0.82rem; color: rgba(220,236,244,0.7); transition: all 0.3s; display: flex; align-items: center; gap: 0.5rem; }
+.hobby-tag:hover { border-color: rgba(0,200,240,0.2); transform: translateY(-2px); }
+.hobby-tag .icon { font-size: 1.1rem; }
+
+.contact { justify-content: center; text-align: center; }
+.contact .content { max-width: 500px; }
+.contact-btns { display: flex; gap: 1rem; justify-content: center; margin-top: 1.5rem; }
+.btn { padding: 0.75rem 1.5rem; border-radius: 50px; text-decoration: none; font-size: 0.85rem; font-weight: 500; transition: all 0.3s; border: 1px solid rgba(0,200,240,0.15); color: #b0c4d4; }
+.btn:hover { border-color: #00d4f0; color: #00d4f0; box-shadow: 0 0 20px rgba(0,200,240,0.1); }
+
+@media (max-width: 768px) {
+  section { padding: 4rem 1.5rem 4rem 3rem; }
+  .section-right { justify-content: flex-start; }
+  .section-right .content { text-align: left; }
+  .section-right .stats-inline { justify-content: flex-start; }
+  .stats-inline { flex-wrap: wrap; }
+}
+</style>
+</head>
+<body>
+<canvas id="scene"></canvas>
+<div class="depth-overlay" id="depth-overlay"></div>
+<div class="progress-line"><div class="progress-track"><div class="progress-fill" id="progress"></div></div></div>
+<div class="depth-label-fixed" id="depth-label">Surface — 0m</div>
+
+<section class="hero visible">
+  <div class="content">
+    <div class="hero-greeting">Hey, I'm</div>
+    <h1>Alexandra<br><span>Garibaldi</span></h1>
+    <p class="hero-tagline">Software Engineer at Amazon in NYC.<br>Building by day. Diving, dancing, and exploring by night.</p>
+    <div class="depth-hint">Scroll to dive deeper ↓</div>
+  </div>
+</section>
+
+<section>
+  <div class="content">
+    <div class="section-num">01 — ABOUT</div>
+    <h2 class="section-heading">Engineer.<br><span>Diver. Explorer.</span></h2>
+    <p class="body">I'm a software engineer who believes life is too short for just one hobby. After graduating from West Chester University with a <strong>4.0 GPA</strong> on a full-tuition scholarship, I moved to NYC and joined <strong>Amazon</strong>.</p>
+    <div class="stats-inline">
+      <div class="stat-pill"><span class="val">4.0</span><span class="lbl">GPA</span></div>
+      <div class="stat-pill"><span class="val">PADI</span><span class="lbl">Certified</span></div>
+      <div class="stat-pill"><span class="val">8+</span><span class="lbl">Hobbies</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section-right">
+  <div class="content">
+    <div class="section-num">02 — EXPERIENCE</div>
+    <h2 class="section-heading">Where I've <span>Built</span></h2>
+    <div class="exp-item">
+      <div class="exp-top"><h3>Amazon</h3><span class="exp-date">Present</span></div>
+      <p class="exp-role">Software Engineer · NYC</p>
+      <p class="exp-desc">Building scalable, high-impact systems serving millions globally.</p>
+    </div>
+    <div class="exp-item">
+      <div class="exp-top"><h3>West Chester University</h3><span class="exp-date">2017 – 2021</span></div>
+      <p class="exp-role">B.S. Computer Science · 4.0 Major GPA</p>
+      <p class="exp-desc">Board of Governor's Full Tuition Scholar. Honors College. Dean's List.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="content">
+    <div class="section-num">03 — A RICH LIFE</div>
+    <h2 class="section-heading">I collect hobbies like they're <span>going out of style.</span></h2>
+    <div class="hobby-flow">
+      <div class="hobby-tag"><span class="icon">🤿</span> Scuba Diving</div>
+      <div class="hobby-tag"><span class="icon">⛷️</span> Skiing</div>
+      <div class="hobby-tag"><span class="icon">💃</span> Hip Hop Dance</div>
+      <div class="hobby-tag"><span class="icon">🏑</span> Field Hockey</div>
+      <div class="hobby-tag"><span class="icon">🎹</span> Piano</div>
+      <div class="hobby-tag"><span class="icon">📚</span> Reading</div>
+      <div class="hobby-tag"><span class="icon">🎶</span> EDM & Festivals</div>
+      <div class="hobby-tag"><span class="icon">🌊</span> Ocean Life</div>
+    </div>
+  </div>
+</section>
+
+<section class="contact">
+  <div class="content">
+    <div class="section-num">04 — CONNECT</div>
+    <h2 class="section-heading"><span>Say Hello</span></h2>
+    <p class="body">Whether it's about code, the ocean, or the next festival — I'd love to hear from you.</p>
+    <div class="contact-btns">
+      <a href="https://github.com/aygaribaldi" class="btn" target="_blank">GitHub</a>
+      <a href="https://linkedin.com/in/alexandra-garibaldi" class="btn" target="_blank">LinkedIn</a>
+    </div>
+  </div>
+</section>
+
+<script>
+const canvas = document.getElementById('scene');
+const ctx = canvas.getContext('2d');
+let w, h;
+function resize() { w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+// Scroll state
+let scrollPct = 0;
+const progress = document.getElementById('progress');
+const overlay = document.getElementById('depth-overlay');
+const depthLabel = document.getElementById('depth-label');
+const sections = document.querySelectorAll('section');
+
+const zones = [
+  { name: 'Surface', depth: 0, bg: 'rgba(6,20,40,0)' },
+  { name: 'Shallow Reef', depth: 30, bg: 'rgba(8,60,80,0.15)' },
+  { name: 'Mid-water', depth: 80, bg: 'rgba(4,20,45,0.3)' },
+  { name: 'Twilight Zone', depth: 150, bg: 'rgba(2,8,20,0.5)' },
+  { name: 'The Deep', depth: 200, bg: 'rgba(1,4,10,0.7)' },
+];
+
+function onScroll() {
+  const scrollTop = window.scrollY;
+  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+  scrollPct = Math.min(scrollTop / docHeight, 1);
+  progress.style.height = (scrollPct * 100) + '%';
+
+  const zoneIdx = Math.min(Math.floor(scrollPct * zones.length), zones.length - 1);
+  const zone = zones[zoneIdx];
+  overlay.style.background = zone.bg;
+  depthLabel.textContent = `${zone.name} — ${Math.round(zone.depth + (scrollPct * zones.length % 1) * (zones[Math.min(zoneIdx+1, zones.length-1)].depth - zone.depth))}m`;
+
+  sections.forEach(s => {
+    const rect = s.getBoundingClientRect();
+    if (rect.top < window.innerHeight * 0.75) s.classList.add('visible');
+  });
+}
+window.addEventListener('scroll', onScroll, { passive: true });
+
+// Animated scene
+const bubbles = Array.from({length: 50}, () => ({
+  x: Math.random() * 2000, y: Math.random() * 2000,
+  r: 1 + Math.random() * 4, speed: 0.3 + Math.random() * 0.8,
+  wobble: Math.random() * Math.PI * 2
+}));
+
+const jellies = Array.from({length: 4}, (_, i) => ({
+  x: w * 0.15 + Math.random() * w * 0.7,
+  baseY: 0.3 + Math.random() * 0.5,
+  size: 15 + Math.random() * 25,
+  color: ['rgba(255,105,180,', 'rgba(0,229,255,', 'rgba(168,85,247,', 'rgba(34,211,238,'][i],
+  speed: 0.5 + Math.random() * 0.5,
+  phase: Math.random() * Math.PI * 2
+}));
+
+const fish = Array.from({length: 12}, () => ({
+  x: -50, y: Math.random() * h,
+  speed: 1 + Math.random() * 2, size: 8 + Math.random() * 12,
+  phase: Math.random() * 10000
+}));
+
+const rays = Array.from({length: 6}, (_, i) => ({
+  x: w * 0.1 + i * w * 0.16, width: 12 + Math.random() * 20,
+  phase: Math.random() * Math.PI * 2, speed: 0.2 + Math.random() * 0.3
+}));
+
+function draw(t) {
+  ctx.clearRect(0, 0, w, h);
+  const lightFade = 1 - scrollPct * 0.8;
+
+  // God rays (fade with depth)
+  if (lightFade > 0.2) {
+    rays.forEach(r => {
+      const sway = Math.sin(t * 0.001 * r.speed + r.phase) * 25;
+      const grad = ctx.createLinearGradient(r.x + sway, 0, r.x + sway, h);
+      grad.addColorStop(0, `rgba(0,180,220,${0.05 * lightFade})`);
+      grad.addColorStop(1, 'transparent');
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(r.x + sway - r.width/2, 0);
+      ctx.lineTo(r.x + sway + r.width/2, 0);
+      ctx.lineTo(r.x + sway + r.width + 30, h);
+      ctx.lineTo(r.x + sway - r.width - 10, h);
+      ctx.fill();
+    });
+  }
+
+  // Bubbles
+  bubbles.forEach(b => {
+    b.y -= b.speed;
+    b.x += Math.sin(t * 0.002 + b.wobble) * 0.3;
+    if (b.y < -10) { b.y = h + 10; b.x = Math.random() * w; }
+    ctx.beginPath();
+    ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(0,200,240,${0.06 + scrollPct * 0.06})`;
+    ctx.fill();
+  });
+
+  // Jellyfish (more visible as you go deeper)
+  const jellyOpacity = Math.max(0, (scrollPct - 0.2) * 1.5);
+  if (jellyOpacity > 0) {
+    jellies.forEach(j => {
+      const jy = h * j.baseY + Math.sin(t * 0.001 * j.speed + j.phase) * 30;
+      const jx = j.x + Math.sin(t * 0.0005 + j.phase) * 40;
+      const pulse = 1 + Math.sin(t * 0.003 * j.speed) * 0.15;
+      const alpha = Math.min(jellyOpacity, 0.4);
+
+      // Glow
+      const glow = ctx.createRadialGradient(jx, jy, 0, jx, jy, j.size * 2);
+      glow.addColorStop(0, j.color + (alpha * 0.3) + ')');
+      glow.addColorStop(1, 'transparent');
+      ctx.fillStyle = glow;
+      ctx.fillRect(jx - j.size * 2, jy - j.size * 2, j.size * 4, j.size * 4);
+
+      // Bell
+      ctx.beginPath();
+      ctx.ellipse(jx, jy, j.size * pulse * 0.9, j.size * pulse * 0.65, 0, Math.PI, 0);
+      ctx.fillStyle = j.color + alpha + ')';
+      ctx.fill();
+
+      // Tentacles
+      for (let t2 = 0; t2 < 5; t2++) {
+        const tx = jx - j.size * 0.5 + t2 * j.size * 0.25;
+        const sway2 = Math.sin(t * 0.003 + t2 + j.phase) * 5;
+        ctx.beginPath();
+        ctx.moveTo(tx, jy + j.size * 0.2);
+        ctx.quadraticCurveTo(tx + sway2, jy + j.size * 0.8, tx + sway2 * 1.5, jy + j.size * 1.2 + t2 * 3);
+        ctx.strokeStyle = j.color + (alpha * 0.5) + ')';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    });
+  }
+
+  // Fish schools
+  fish.forEach(f => {
+    f.x += f.speed;
+    if (f.x > w + 50) { f.x = -50; f.y = Math.random() * h; }
+    const fy = f.y + Math.sin(t * 0.003 + f.phase) * 8;
+    ctx.fillStyle = `rgba(0,180,220,${0.06 + scrollPct * 0.04})`;
+    ctx.beginPath();
+    ctx.moveTo(f.x + f.size, fy);
+    ctx.lineTo(f.x, fy - f.size * 0.3);
+    ctx.lineTo(f.x, fy + f.size * 0.3);
+    ctx.closePath();
+    ctx.fill();
+    // Tail
+    ctx.beginPath();
+    ctx.moveTo(f.x, fy);
+    ctx.lineTo(f.x - f.size * 0.5, fy - f.size * 0.25);
+    ctx.lineTo(f.x - f.size * 0.5, fy + f.size * 0.25);
+    ctx.closePath();
+    ctx.fill();
+  });
+
+  // Laser beams at depth (EDM zone)
+  if (scrollPct > 0.7) {
+    const laserAlpha = (scrollPct - 0.7) * 2;
+    const colors = ['rgba(0,240,255,', 'rgba(255,45,170,', 'rgba(94,94,255,', 'rgba(168,85,247,'];
+    for (let i = 0; i < 6; i++) {
+      const angle = Math.sin(t * 0.001 + i * 1.2) * 0.3;
+      const bx = w * 0.2 + i * w * 0.12;
+      ctx.save();
+      ctx.translate(bx, h);
+      ctx.rotate(-Math.PI/2 + angle);
+      ctx.fillStyle = colors[i % 4] + (laserAlpha * 0.15 * (0.6 + Math.sin(t * 0.005 + i) * 0.4)) + ')';
+      ctx.fillRect(-1, 0, 2, h * 0.8);
+      // Beam glow
+      ctx.fillStyle = colors[i % 4] + (laserAlpha * 0.04) + ')';
+      ctx.fillRect(-8, 0, 16, h * 0.8);
+      ctx.restore();
+    }
+  }
+
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+onScroll();
+</script>
+</body>
+</html>
