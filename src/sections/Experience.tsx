@@ -15,16 +15,6 @@ export default function Experience() {
         </p>
       </div>
 
-      <div className="exp-item">
-        <div className="exp-top">
-          <h3>West Chester University</h3>
-          <span className="exp-date">2017 – 2021</span>
-        </div>
-        <p className="exp-role">B.S. Computer Science · 4.0 Major GPA</p>
-        <p className="exp-desc">
-          Board of Governor's Full Tuition Scholar. Honors College. Dean's List.
-        </p>
-      </div>
     </section>
   );
 }

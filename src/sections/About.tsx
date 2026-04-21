@@ -10,10 +10,6 @@ export default function About() {
           </h2>
           <div className="neon-stats">
             <div className="neon-stat">
-              <span className="val">4.0</span>
-              <span className="lbl">GPA</span>
-            </div>
-            <div className="neon-stat">
               <span className="val">NYC</span>
               <span className="lbl">Based</span>
             </div>
@@ -26,8 +22,8 @@ export default function About() {
         <div className="col">
           <p>
             I'm a software engineer who believes life is too short for just one hobby.
-            After graduating from West Chester University with a <strong>4.0 GPA</strong> on
-            a full-tuition scholarship, I moved to NYC and joined <strong>Amazon</strong>.
+            Based in <strong>NYC</strong>, I build at <strong>Amazon</strong> by day and chase
+            adventures the rest of the time.
           </p>
           <br />
           <p>
