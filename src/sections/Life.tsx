@@ -14,8 +14,8 @@ export default function Life() {
     <section id="life" className="hobbies-section">
       <div className="tag">A Rich Life</div>
       <h2 className="heading">
-        I collect hobbies like they're<br />
-        <span>going out of style.</span>
+        Off the clock,<br />
+        <span>never off the move.</span>
       </h2>
       <div className="hobby-pills">
         {hobbies.map(h => (
