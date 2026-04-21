@@ -22,6 +22,25 @@ interface SeaPlant {
   x: number; height: number; color: string; phase: number;
 }
 
+interface FishSchool {
+  x: number; y: number; count: number; spacing: number;
+  speed: number; color: string; phase: number; dir: number;
+}
+
+interface Turtle {
+  x: number; y: number; size: number; color: string;
+  speed: number; phase: number; dir: number;
+}
+
+interface MantaRay {
+  x: number; y: number; size: number; color: string;
+  speed: number; phase: number; dir: number;
+}
+
+interface Seahorse {
+  x: number; y: number; size: number; color: string; phase: number;
+}
+
 export default function NeonCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -74,6 +93,42 @@ export default function NeonCanvas() {
       x: Math.random() * w,
       height: 40 + Math.random() * 50,
       color: ['46,204,113', '26,188,156', '0,184,148'][Math.floor(Math.random() * 3)],
+      phase: Math.random() * Math.PI * 2,
+    }));
+
+    const fishSchools: FishSchool[] = Array.from({ length: 4 }, () => {
+      const dir = Math.random() > 0.5 ? 1 : -1;
+      return {
+        x: Math.random() * w, y: h * 0.15 + Math.random() * h * 0.55,
+        count: 5 + Math.floor(Math.random() * 6), spacing: 12 + Math.random() * 8,
+        speed: 0.3 + Math.random() * 0.4, dir,
+        color: ['0,229,255', '168,85,247', '34,211,238', '255,105,180'][Math.floor(Math.random() * 4)],
+        phase: Math.random() * Math.PI * 2,
+      };
+    });
+
+    const turtles: Turtle[] = Array.from({ length: 2 }, () => {
+      const dir = Math.random() > 0.5 ? 1 : -1;
+      return {
+        x: dir === 1 ? -60 : w + 60,
+        y: h * 0.2 + Math.random() * h * 0.4,
+        size: 18 + Math.random() * 10, speed: 0.15 + Math.random() * 0.15, dir,
+        color: ['46,204,113', '26,188,156'][Math.floor(Math.random() * 2)],
+        phase: Math.random() * Math.PI * 2,
+      };
+    });
+
+    const mantaRays: MantaRay[] = [{
+      x: Math.random() * w, y: h * 0.25 + Math.random() * h * 0.3,
+      size: 30 + Math.random() * 15, speed: 0.2 + Math.random() * 0.1,
+      dir: Math.random() > 0.5 ? 1 : -1,
+      color: '94,94,255', phase: Math.random() * Math.PI * 2,
+    }];
+
+    const seahorses: Seahorse[] = Array.from({ length: 3 }, () => ({
+      x: Math.random() * w, y: h * 0.5 + Math.random() * h * 0.35,
+      size: 8 + Math.random() * 6,
+      color: ['255,183,77', '233,121,249', '0,229,255'][Math.floor(Math.random() * 3)],
       phase: Math.random() * Math.PI * 2,
     }));
 
@@ -168,6 +223,169 @@ export default function NeonCanvas() {
           ctx.lineWidth = 0.8;
           ctx.stroke();
         }
+      });
+
+      // Fish schools
+      fishSchools.forEach(s => {
+        s.x += s.speed * s.dir;
+        if (s.dir === 1 && s.x > w + 100) s.x = -100;
+        if (s.dir === -1 && s.x < -100) s.x = w + 100;
+        for (let i = 0; i < s.count; i++) {
+          const row = i % 3;
+          const col = Math.floor(i / 3);
+          const fx = s.x - col * s.spacing * s.dir + Math.sin(t * 0.003 + i + s.phase) * 4;
+          const fy = s.y + (row - 1) * s.spacing * 0.7 + Math.sin(t * 0.004 + i * 0.5) * 3;
+          const sz = 5;
+          ctx.save();
+          ctx.translate(fx, fy);
+          if (s.dir === -1) ctx.scale(-1, 1);
+          ctx.fillStyle = `rgba(${s.color},0.18)`;
+          ctx.beginPath();
+          ctx.ellipse(0, 0, sz, sz * 0.4, 0, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.moveTo(-sz, 0);
+          ctx.lineTo(-sz - 3, -2.5);
+          ctx.lineTo(-sz - 3, 2.5);
+          ctx.closePath();
+          ctx.fill();
+          ctx.restore();
+        }
+      });
+
+      // Sea turtles
+      turtles.forEach(tu => {
+        tu.x += tu.speed * tu.dir;
+        if (tu.dir === 1 && tu.x > w + 80) tu.x = -80;
+        if (tu.dir === -1 && tu.x < -80) tu.x = w + 80;
+        const ty = tu.y + Math.sin(t * 0.001 + tu.phase) * 15;
+        const flipper = Math.sin(t * 0.002 + tu.phase) * 0.3;
+        const s = tu.size;
+        ctx.save();
+        ctx.translate(tu.x, ty);
+        if (tu.dir === -1) ctx.scale(-1, 1);
+        const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 2);
+        glow.addColorStop(0, `rgba(${tu.color},0.06)`);
+        glow.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow;
+        ctx.fillRect(-s * 2, -s * 2, s * 4, s * 4);
+        ctx.fillStyle = `rgba(${tu.color},0.15)`;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, s, s * 0.65, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = `rgba(${tu.color},0.25)`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        ctx.fillStyle = `rgba(${tu.color},0.12)`;
+        ctx.beginPath();
+        ctx.ellipse(s * 0.9, 0, s * 0.3, s * 0.2, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.save();
+        ctx.translate(-s * 0.6, -s * 0.5);
+        ctx.rotate(flipper);
+        ctx.beginPath();
+        ctx.ellipse(0, -s * 0.3, s * 0.15, s * 0.5, -0.3, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${tu.color},0.12)`;
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.translate(-s * 0.6, s * 0.5);
+        ctx.rotate(-flipper);
+        ctx.beginPath();
+        ctx.ellipse(0, s * 0.3, s * 0.15, s * 0.5, 0.3, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${tu.color},0.12)`;
+        ctx.fill();
+        ctx.restore();
+        ctx.restore();
+      });
+
+      // Manta ray
+      mantaRays.forEach(m => {
+        m.x += m.speed * m.dir;
+        if (m.dir === 1 && m.x > w + 120) m.x = -120;
+        if (m.dir === -1 && m.x < -120) m.x = w + 120;
+        const my = m.y + Math.sin(t * 0.0008 + m.phase) * 20;
+        const wingFlap = Math.sin(t * 0.002 + m.phase) * 0.15;
+        const s = m.size;
+        ctx.save();
+        ctx.translate(m.x, my);
+        if (m.dir === -1) ctx.scale(-1, 1);
+        const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 3);
+        glow.addColorStop(0, `rgba(${m.color},0.05)`);
+        glow.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow;
+        ctx.fillRect(-s * 3, -s * 3, s * 6, s * 6);
+        ctx.fillStyle = `rgba(${m.color},0.14)`;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, s * 0.5, s * 0.25, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.save();
+        ctx.translate(-s * 0.2, 0);
+        ctx.rotate(wingFlap);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(-s * 0.5, -s * 0.8, -s * 1.2, -s * 0.1);
+        ctx.quadraticCurveTo(-s * 0.5, s * 0.15, 0, 0);
+        ctx.fillStyle = `rgba(${m.color},0.1)`;
+        ctx.fill();
+        ctx.restore();
+        ctx.save();
+        ctx.translate(-s * 0.2, 0);
+        ctx.rotate(-wingFlap);
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.quadraticCurveTo(-s * 0.5, s * 0.8, -s * 1.2, s * 0.1);
+        ctx.quadraticCurveTo(-s * 0.5, -s * 0.15, 0, 0);
+        ctx.fillStyle = `rgba(${m.color},0.1)`;
+        ctx.fill();
+        ctx.restore();
+        ctx.beginPath();
+        ctx.moveTo(-s * 0.5, 0);
+        const tailSway = Math.sin(t * 0.003 + m.phase) * 5;
+        ctx.quadraticCurveTo(-s * 0.9, tailSway, -s * 1.3, tailSway * 1.5);
+        ctx.strokeStyle = `rgba(${m.color},0.12)`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.restore();
+      });
+
+      // Seahorses
+      seahorses.forEach(sh => {
+        const sx = sh.x + Math.sin(t * 0.0006 + sh.phase) * 12;
+        const sy = sh.y + Math.sin(t * 0.001 + sh.phase) * 8;
+        const s = sh.size;
+        ctx.save();
+        ctx.translate(sx, sy);
+        const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 2);
+        glow.addColorStop(0, `rgba(${sh.color},0.06)`);
+        glow.addColorStop(1, 'transparent');
+        ctx.fillStyle = glow;
+        ctx.fillRect(-s * 2, -s * 2, s * 4, s * 4);
+        ctx.fillStyle = `rgba(${sh.color},0.18)`;
+        ctx.beginPath();
+        ctx.ellipse(0, -s * 0.3, s * 0.35, s * 0.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(0, -s * 0.9, s * 0.25, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(s * 0.2, -s * 0.9);
+        ctx.lineTo(s * 0.5, -s * 1.1);
+        ctx.strokeStyle = `rgba(${sh.color},0.15)`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+        const curlPhase = Math.sin(t * 0.002 + sh.phase) * 3;
+        ctx.beginPath();
+        ctx.moveTo(0, s * 0.15);
+        ctx.bezierCurveTo(
+          -s * 0.1, s * 0.5,
+          -s * 0.3, s * 0.8 + curlPhase,
+          -s * 0.15, s * 1.1 + curlPhase,
+        );
+        ctx.strokeStyle = `rgba(${sh.color},0.14)`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.restore();
       });
 
       // Bioluminescent particles
