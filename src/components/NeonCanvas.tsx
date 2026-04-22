@@ -36,6 +36,8 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
+const TINT_SCALE = 4;
+
 function tintImage(
   img: HTMLImageElement,
   color: string,
@@ -43,13 +45,13 @@ function tintImage(
   h: number,
 ): HTMLCanvasElement {
   const c = document.createElement('canvas');
-  c.width = w;
-  c.height = h;
+  c.width = w * TINT_SCALE;
+  c.height = h * TINT_SCALE;
   const cx = c.getContext('2d')!;
-  cx.drawImage(img, 0, 0, w, h);
+  cx.drawImage(img, 0, 0, c.width, c.height);
   cx.globalCompositeOperation = 'source-in';
   cx.fillStyle = color;
-  cx.fillRect(0, 0, w, h);
+  cx.fillRect(0, 0, c.width, c.height);
   return c;
 }
 
@@ -82,6 +84,7 @@ export default function NeonCanvas() {
     function resize() {
       w = canvas.width = window.innerWidth;
       h = canvas.height = window.innerHeight;
+      TINT_CACHE.clear();
     }
     resize();
     window.addEventListener('resize', resize);
@@ -191,7 +194,9 @@ export default function NeonCanvas() {
       ctx.translate(x, y);
       if (flipX) ctx.scale(-1, 1);
       ctx.globalAlpha = alpha;
-      ctx.drawImage(tinted, -spriteW / 2, -spriteH / 2, spriteW, spriteH);
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(tinted, 0, 0, tinted.width, tinted.height, -spriteW / 2, -spriteH / 2, spriteW, spriteH);
       ctx.restore();
     }
 
@@ -296,7 +301,7 @@ export default function NeonCanvas() {
           if (m.dir === 1 && m.x > w + 120) m.x = -120;
           if (m.dir === -1 && m.x < -120) m.x = w + 120;
           const my = m.y + Math.sin(t * 0.0008 + m.phase) * 20;
-          const aspect = 100 / 70;
+          const aspect = 120 / 80;
           const sh = m.size / aspect;
           drawGlow(m.x, my, m.size * 1.0, m.color, 0.04);
           drawSprite(mantaImg, m.color, m.x, my, m.size, sh, 0.18, m.dir === -1);
