@@ -100,7 +100,7 @@ export default function NeonCanvas() {
       return {
         x: dir === 1 ? -60 : w + 60,
         y: h * 0.2 + Math.random() * h * 0.4,
-        size: 18 + Math.random() * 10, speed: 0.15 + Math.random() * 0.15, dir,
+        size: 22 + Math.random() * 10, speed: 0.15 + Math.random() * 0.15, dir,
         color: ['46,204,113', '26,188,156'][Math.floor(Math.random() * 2)],
         phase: Math.random() * Math.PI * 2,
       };
@@ -108,14 +108,14 @@ export default function NeonCanvas() {
 
     const mantaRays: MantaRay[] = [{
       x: Math.random() * w, y: h * 0.25 + Math.random() * h * 0.3,
-      size: 30 + Math.random() * 15, speed: 0.2 + Math.random() * 0.1,
+      size: 35 + Math.random() * 15, speed: 0.2 + Math.random() * 0.1,
       dir: Math.random() > 0.5 ? 1 : -1,
       color: '94,94,255', phase: Math.random() * Math.PI * 2,
     }];
 
     const seahorses: Seahorse[] = Array.from({ length: 3 }, () => ({
       x: Math.random() * w, y: h * 0.5 + Math.random() * h * 0.35,
-      size: 8 + Math.random() * 6,
+      size: 10 + Math.random() * 6,
       color: ['255,183,77', '233,121,249', '0,229,255'][Math.floor(Math.random() * 3)],
       phase: Math.random() * Math.PI * 2,
     }));
@@ -254,43 +254,107 @@ export default function NeonCanvas() {
         if (tu.dir === 1 && tu.x > w + 80) tu.x = -80;
         if (tu.dir === -1 && tu.x < -80) tu.x = w + 80;
         const ty = tu.y + Math.sin(t * 0.001 + tu.phase) * 15;
-        const flipper = Math.sin(t * 0.002 + tu.phase) * 0.3;
+        const flipAngle = Math.sin(t * 0.002 + tu.phase) * 0.35;
         const s = tu.size;
         ctx.save();
         ctx.translate(tu.x, ty);
         if (tu.dir === -1) ctx.scale(-1, 1);
-        const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 2);
+
+        const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 2.5);
         glow.addColorStop(0, `rgba(${tu.color},0.06)`);
         glow.addColorStop(1, 'transparent');
         ctx.fillStyle = glow;
-        ctx.fillRect(-s * 2, -s * 2, s * 4, s * 4);
-        ctx.fillStyle = `rgba(${tu.color},0.15)`;
+        ctx.fillRect(-s * 3, -s * 3, s * 6, s * 6);
+
+        // Front flippers
+        ctx.save();
+        ctx.translate(s * 0.2, -s * 0.55);
+        ctx.rotate(-0.4 + flipAngle);
+        ctx.fillStyle = `rgba(${tu.color},0.12)`;
         ctx.beginPath();
-        ctx.ellipse(0, 0, s, s * 0.65, 0, 0, Math.PI * 2);
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(s * 0.3, -s * 0.15, s * 0.9, -s * 0.5, s * 1.1, -s * 0.3);
+        ctx.bezierCurveTo(s * 0.85, -s * 0.1, s * 0.3, s * 0.05, 0, 0);
         ctx.fill();
-        ctx.strokeStyle = `rgba(${tu.color},0.25)`;
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(s * 0.2, s * 0.55);
+        ctx.rotate(0.4 - flipAngle);
+        ctx.fillStyle = `rgba(${tu.color},0.12)`;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(s * 0.3, s * 0.15, s * 0.9, s * 0.5, s * 1.1, s * 0.3);
+        ctx.bezierCurveTo(s * 0.85, s * 0.1, s * 0.3, -s * 0.05, 0, 0);
+        ctx.fill();
+        ctx.restore();
+
+        // Back flippers
+        ctx.save();
+        ctx.translate(-s * 0.7, -s * 0.35);
+        ctx.rotate(-0.2 + flipAngle * 0.5);
+        ctx.fillStyle = `rgba(${tu.color},0.1)`;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(s * 0.1, -s * 0.1, s * 0.35, -s * 0.3, s * 0.45, -s * 0.2);
+        ctx.bezierCurveTo(s * 0.3, -s * 0.05, s * 0.1, s * 0.02, 0, 0);
+        ctx.fill();
+        ctx.restore();
+
+        ctx.save();
+        ctx.translate(-s * 0.7, s * 0.35);
+        ctx.rotate(0.2 - flipAngle * 0.5);
+        ctx.fillStyle = `rgba(${tu.color},0.1)`;
+        ctx.beginPath();
+        ctx.moveTo(0, 0);
+        ctx.bezierCurveTo(s * 0.1, s * 0.1, s * 0.35, s * 0.3, s * 0.45, s * 0.2);
+        ctx.bezierCurveTo(s * 0.3, s * 0.05, s * 0.1, -s * 0.02, 0, 0);
+        ctx.fill();
+        ctx.restore();
+
+        // Short tail
+        ctx.beginPath();
+        ctx.moveTo(-s * 0.85, 0);
+        ctx.lineTo(-s * 1.15, Math.sin(t * 0.003 + tu.phase) * 2);
+        ctx.strokeStyle = `rgba(${tu.color},0.12)`;
+        ctx.lineWidth = s * 0.08;
+        ctx.lineCap = 'round';
+        ctx.stroke();
+
+        // Shell (oval body)
+        ctx.fillStyle = `rgba(${tu.color},0.16)`;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, s * 0.9, s * 0.6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = `rgba(${tu.color},0.22)`;
         ctx.lineWidth = 1;
         ctx.stroke();
-        ctx.fillStyle = `rgba(${tu.color},0.12)`;
+
+        // Shell pattern — hexagonal scute lines
+        ctx.strokeStyle = `rgba(${tu.color},0.1)`;
+        ctx.lineWidth = 0.6;
         ctx.beginPath();
-        ctx.ellipse(s * 0.9, 0, s * 0.3, s * 0.2, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.save();
-        ctx.translate(-s * 0.6, -s * 0.5);
-        ctx.rotate(flipper);
+        ctx.moveTo(-s * 0.3, -s * 0.5); ctx.lineTo(-s * 0.3, s * 0.5);
+        ctx.moveTo(s * 0.3, -s * 0.5); ctx.lineTo(s * 0.3, s * 0.5);
+        ctx.moveTo(-s * 0.7, 0); ctx.lineTo(s * 0.7, 0);
+        ctx.moveTo(-s * 0.3, -s * 0.5); ctx.lineTo(s * 0.3, -s * 0.25);
+        ctx.moveTo(-s * 0.3, s * 0.5); ctx.lineTo(s * 0.3, s * 0.25);
+        ctx.stroke();
+
+        // Head
+        ctx.fillStyle = `rgba(${tu.color},0.14)`;
         ctx.beginPath();
-        ctx.ellipse(0, -s * 0.3, s * 0.15, s * 0.5, -0.3, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${tu.color},0.12)`;
+        ctx.moveTo(s * 0.85, 0);
+        ctx.bezierCurveTo(s * 1.0, -s * 0.15, s * 1.25, -s * 0.12, s * 1.3, 0);
+        ctx.bezierCurveTo(s * 1.25, s * 0.12, s * 1.0, s * 0.15, s * 0.85, 0);
         ctx.fill();
-        ctx.restore();
-        ctx.save();
-        ctx.translate(-s * 0.6, s * 0.5);
-        ctx.rotate(-flipper);
+
+        // Eye
         ctx.beginPath();
-        ctx.ellipse(0, s * 0.3, s * 0.15, s * 0.5, 0.3, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${tu.color},0.12)`;
+        ctx.arc(s * 1.1, -s * 0.04, s * 0.04, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${tu.color},0.4)`;
         ctx.fill();
-        ctx.restore();
+
         ctx.restore();
       });
 
@@ -300,47 +364,86 @@ export default function NeonCanvas() {
         if (m.dir === 1 && m.x > w + 120) m.x = -120;
         if (m.dir === -1 && m.x < -120) m.x = w + 120;
         const my = m.y + Math.sin(t * 0.0008 + m.phase) * 20;
-        const wingFlap = Math.sin(t * 0.002 + m.phase) * 0.15;
+        const wingFlap = Math.sin(t * 0.002 + m.phase) * 0.18;
         const s = m.size;
         ctx.save();
         ctx.translate(m.x, my);
         if (m.dir === -1) ctx.scale(-1, 1);
+
         const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 3);
         glow.addColorStop(0, `rgba(${m.color},0.05)`);
         glow.addColorStop(1, 'transparent');
         ctx.fillStyle = glow;
         ctx.fillRect(-s * 3, -s * 3, s * 6, s * 6);
-        ctx.fillStyle = `rgba(${m.color},0.14)`;
-        ctx.beginPath();
-        ctx.ellipse(0, 0, s * 0.5, s * 0.25, 0, 0, Math.PI * 2);
-        ctx.fill();
+
+        // Top wing
         ctx.save();
-        ctx.translate(-s * 0.2, 0);
         ctx.rotate(wingFlap);
+        ctx.fillStyle = `rgba(${m.color},0.11)`;
         ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.quadraticCurveTo(-s * 0.5, -s * 0.8, -s * 1.2, -s * 0.1);
-        ctx.quadraticCurveTo(-s * 0.5, s * 0.15, 0, 0);
-        ctx.fillStyle = `rgba(${m.color},0.1)`;
+        ctx.moveTo(s * 0.4, 0);
+        ctx.bezierCurveTo(s * 0.3, -s * 0.25, -s * 0.2, -s * 0.6, -s * 0.7, -s * 0.9);
+        ctx.bezierCurveTo(-s * 1.1, -s * 1.05, -s * 1.4, -s * 0.7, -s * 1.3, -s * 0.35);
+        ctx.bezierCurveTo(-s * 1.2, -s * 0.1, -s * 0.6, s * 0.05, -s * 0.15, 0);
+        ctx.closePath();
         ctx.fill();
         ctx.restore();
+
+        // Bottom wing
         ctx.save();
-        ctx.translate(-s * 0.2, 0);
         ctx.rotate(-wingFlap);
+        ctx.fillStyle = `rgba(${m.color},0.11)`;
         ctx.beginPath();
-        ctx.moveTo(0, 0);
-        ctx.quadraticCurveTo(-s * 0.5, s * 0.8, -s * 1.2, s * 0.1);
-        ctx.quadraticCurveTo(-s * 0.5, -s * 0.15, 0, 0);
-        ctx.fillStyle = `rgba(${m.color},0.1)`;
+        ctx.moveTo(s * 0.4, 0);
+        ctx.bezierCurveTo(s * 0.3, s * 0.25, -s * 0.2, s * 0.6, -s * 0.7, s * 0.9);
+        ctx.bezierCurveTo(-s * 1.1, s * 1.05, -s * 1.4, s * 0.7, -s * 1.3, s * 0.35);
+        ctx.bezierCurveTo(-s * 1.2, s * 0.1, -s * 0.6, -s * 0.05, -s * 0.15, 0);
+        ctx.closePath();
         ctx.fill();
         ctx.restore();
+
+        // Central body — diamond/kite shape
+        ctx.fillStyle = `rgba(${m.color},0.15)`;
+        ctx.beginPath();
+        ctx.moveTo(s * 0.55, 0);
+        ctx.bezierCurveTo(s * 0.4, -s * 0.18, s * 0.1, -s * 0.22, -s * 0.2, -s * 0.12);
+        ctx.lineTo(-s * 0.5, 0);
+        ctx.lineTo(-s * 0.2, s * 0.12);
+        ctx.bezierCurveTo(s * 0.1, s * 0.22, s * 0.4, s * 0.18, s * 0.55, 0);
+        ctx.closePath();
+        ctx.fill();
+
+        // Cephalic fins (horn-like flaps at the front)
+        ctx.fillStyle = `rgba(${m.color},0.13)`;
+        ctx.beginPath();
+        ctx.moveTo(s * 0.5, -s * 0.06);
+        ctx.bezierCurveTo(s * 0.6, -s * 0.15, s * 0.75, -s * 0.22, s * 0.7, -s * 0.3);
+        ctx.bezierCurveTo(s * 0.65, -s * 0.2, s * 0.55, -s * 0.12, s * 0.5, -s * 0.06);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.moveTo(s * 0.5, s * 0.06);
+        ctx.bezierCurveTo(s * 0.6, s * 0.15, s * 0.75, s * 0.22, s * 0.7, s * 0.3);
+        ctx.bezierCurveTo(s * 0.65, s * 0.2, s * 0.55, s * 0.12, s * 0.5, s * 0.06);
+        ctx.fill();
+
+        // Tail — long thin whip
+        const tailSway = Math.sin(t * 0.003 + m.phase) * 6;
+        const tailSway2 = Math.sin(t * 0.003 + m.phase + 1) * 4;
         ctx.beginPath();
         ctx.moveTo(-s * 0.5, 0);
-        const tailSway = Math.sin(t * 0.003 + m.phase) * 5;
-        ctx.quadraticCurveTo(-s * 0.9, tailSway, -s * 1.3, tailSway * 1.5);
-        ctx.strokeStyle = `rgba(${m.color},0.12)`;
+        ctx.bezierCurveTo(-s * 0.8, tailSway * 0.3, -s * 1.2, tailSway, -s * 1.7, tailSway + tailSway2);
+        ctx.strokeStyle = `rgba(${m.color},0.13)`;
         ctx.lineWidth = 1.5;
+        ctx.lineCap = 'round';
         ctx.stroke();
+
+        // Eyes
+        ctx.beginPath();
+        ctx.arc(s * 0.35, -s * 0.1, s * 0.03, 0, Math.PI * 2);
+        ctx.arc(s * 0.35, s * 0.1, s * 0.03, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${m.color},0.35)`;
+        ctx.fill();
+
         ctx.restore();
       });
 
@@ -351,35 +454,106 @@ export default function NeonCanvas() {
         const s = sh.size;
         ctx.save();
         ctx.translate(sx, sy);
-        const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 2);
+
+        const glow = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 2.5);
         glow.addColorStop(0, `rgba(${sh.color},0.06)`);
         glow.addColorStop(1, 'transparent');
         ctx.fillStyle = glow;
-        ctx.fillRect(-s * 2, -s * 2, s * 4, s * 4);
-        ctx.fillStyle = `rgba(${sh.color},0.18)`;
+        ctx.fillRect(-s * 2.5, -s * 2.5, s * 5, s * 5);
+
+        const bodyColor = `rgba(${sh.color},0.18)`;
+        const lightColor = `rgba(${sh.color},0.13)`;
+
+        // Curled tail
+        const curlPhase = Math.sin(t * 0.002 + sh.phase) * 2;
         ctx.beginPath();
-        ctx.ellipse(0, -s * 0.3, s * 0.35, s * 0.5, 0, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.arc(0, -s * 0.9, s * 0.25, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.beginPath();
-        ctx.moveTo(s * 0.2, -s * 0.9);
-        ctx.lineTo(s * 0.5, -s * 1.1);
-        ctx.strokeStyle = `rgba(${sh.color},0.15)`;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-        const curlPhase = Math.sin(t * 0.002 + sh.phase) * 3;
-        ctx.beginPath();
-        ctx.moveTo(0, s * 0.15);
+        ctx.moveTo(0, s * 0.6);
         ctx.bezierCurveTo(
-          -s * 0.1, s * 0.5,
-          -s * 0.3, s * 0.8 + curlPhase,
-          -s * 0.15, s * 1.1 + curlPhase,
+          s * 0.05, s * 0.9,
+          s * 0.15, s * 1.2 + curlPhase,
+          s * 0.05, s * 1.45 + curlPhase,
         );
-        ctx.strokeStyle = `rgba(${sh.color},0.14)`;
-        ctx.lineWidth = 1.5;
+        ctx.bezierCurveTo(
+          -s * 0.1, s * 1.65 + curlPhase,
+          -s * 0.35, s * 1.55 + curlPhase,
+          -s * 0.35, s * 1.35 + curlPhase,
+        );
+        ctx.bezierCurveTo(
+          -s * 0.35, s * 1.15 + curlPhase,
+          -s * 0.15, s * 1.1 + curlPhase,
+          -s * 0.1, s * 1.2 + curlPhase,
+        );
+        ctx.strokeStyle = lightColor;
+        ctx.lineWidth = s * 0.12;
+        ctx.lineCap = 'round';
         ctx.stroke();
+
+        // Belly/torso — slightly curved column
+        ctx.fillStyle = bodyColor;
+        ctx.beginPath();
+        ctx.moveTo(s * 0.2, -s * 0.4);
+        ctx.bezierCurveTo(s * 0.28, -s * 0.1, s * 0.25, s * 0.25, s * 0.15, s * 0.6);
+        ctx.lineTo(-s * 0.1, s * 0.6);
+        ctx.bezierCurveTo(-s * 0.15, s * 0.25, -s * 0.18, -s * 0.1, -s * 0.12, -s * 0.4);
+        ctx.closePath();
+        ctx.fill();
+
+        // Belly ridges
+        ctx.strokeStyle = `rgba(${sh.color},0.08)`;
+        ctx.lineWidth = 0.5;
+        for (let i = 0; i < 5; i++) {
+          const ry = -s * 0.25 + i * s * 0.2;
+          ctx.beginPath();
+          ctx.moveTo(-s * 0.1, ry);
+          ctx.lineTo(s * 0.2, ry);
+          ctx.stroke();
+        }
+
+        // Head — horse-like with snout
+        ctx.fillStyle = bodyColor;
+        ctx.beginPath();
+        ctx.moveTo(s * 0.15, -s * 0.4);
+        ctx.bezierCurveTo(s * 0.25, -s * 0.6, s * 0.25, -s * 0.85, s * 0.1, -s * 0.95);
+        ctx.bezierCurveTo(0, -s * 1.0, -s * 0.15, -s * 0.9, -s * 0.15, -s * 0.7);
+        ctx.bezierCurveTo(-s * 0.15, -s * 0.55, -s * 0.1, -s * 0.45, -s * 0.05, -s * 0.4);
+        ctx.closePath();
+        ctx.fill();
+
+        // Snout — elongated tube
+        ctx.beginPath();
+        ctx.moveTo(s * 0.1, -s * 0.9);
+        ctx.bezierCurveTo(s * 0.2, -s * 0.92, s * 0.38, -s * 0.9, s * 0.45, -s * 0.85);
+        ctx.bezierCurveTo(s * 0.38, -s * 0.82, s * 0.2, -s * 0.8, s * 0.1, -s * 0.82);
+        ctx.closePath();
+        ctx.fill();
+
+        // Crown/coronet spikes
+        ctx.strokeStyle = lightColor;
+        ctx.lineWidth = 0.8;
+        ctx.beginPath();
+        ctx.moveTo(0, -s * 0.95);
+        ctx.lineTo(-s * 0.05, -s * 1.15);
+        ctx.moveTo(s * 0.05, -s * 0.95);
+        ctx.lineTo(s * 0.08, -s * 1.12);
+        ctx.moveTo(-s * 0.05, -s * 0.92);
+        ctx.lineTo(-s * 0.12, -s * 1.08);
+        ctx.stroke();
+
+        // Dorsal fin (on the back)
+        ctx.fillStyle = lightColor;
+        ctx.beginPath();
+        ctx.moveTo(-s * 0.12, -s * 0.15);
+        ctx.bezierCurveTo(-s * 0.25, -s * 0.25, -s * 0.3, -s * 0.05, -s * 0.25, s * 0.1);
+        ctx.bezierCurveTo(-s * 0.18, s * 0.15, -s * 0.12, s * 0.1, -s * 0.1, s * 0.05);
+        ctx.closePath();
+        ctx.fill();
+
+        // Eye
+        ctx.beginPath();
+        ctx.arc(s * 0.05, -s * 0.78, s * 0.04, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${sh.color},0.4)`;
+        ctx.fill();
+
         ctx.restore();
       });
 
