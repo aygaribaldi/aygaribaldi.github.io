@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30" fill="white">
+  <!-- Body -->
+  <path d="M45 15 C45 8, 32 3, 20 6 C12 8, 6 11, 6 15 C6 19, 12 22, 20 24 C32 27, 45 22, 45 15Z"/>
+  <!-- Tail fin -->
+  <path d="M8 15 C5 10, 0 5, 0 3 C3 7, 5 11, 8 13 M8 15 C5 20, 0 25, 0 27 C3 23, 5 19, 8 17" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+  <path d="M8 15 L2 5 C4 9, 6 12, 8 14 M8 15 L2 25 C4 21, 6 18, 8 16" fill="white" opacity="0.7"/>
+  <!-- Dorsal fin -->
+  <path d="M28 6 C26 2, 22 0, 18 1 C20 3, 24 5, 28 7" opacity="0.8"/>
+  <!-- Ventral fin -->
+  <path d="M25 24 C24 27, 21 29, 18 29 C20 27, 23 25, 25 23" opacity="0.7"/>
+  <!-- Pectoral fin -->
+  <path d="M30 16 C28 19, 24 22, 22 22 C24 20, 27 17, 30 16" opacity="0.6"/>
+  <!-- Eye -->
+  <circle cx="38" cy="13" r="2.5"/>
+  <circle cx="38" cy="13" r="1.2" fill="black"/>
+  <!-- Gill line -->
+  <path d="M34 10 C33 13, 33 17, 34 20" fill="none" stroke="white" stroke-width="0.6" opacity="0.4"/>
+</svg>

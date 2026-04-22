@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 70" fill="white">
+  <!-- Top wing -->
+  <path d="M60 30 C55 22, 40 10, 25 4 C15 0, 5 2, 3 10 C2 16, 8 24, 20 28 C32 31, 48 32, 58 32Z" opacity="0.75"/>
+  <!-- Bottom wing -->
+  <path d="M60 40 C55 48, 40 60, 25 66 C15 70, 5 68, 3 60 C2 54, 8 46, 20 42 C32 39, 48 38, 58 38Z" opacity="0.75"/>
+  <!-- Central body -->
+  <path d="M70 35 C68 30, 60 28, 50 30 C42 32, 38 34, 38 35 C38 36, 42 38, 50 40 C60 42, 68 40, 70 35Z" opacity="0.9"/>
+  <!-- Wing detail lines -->
+  <path d="M55 30 C48 22, 35 14, 22 10" fill="none" stroke="white" stroke-width="0.4" opacity="0.2"/>
+  <path d="M55 40 C48 48, 35 56, 22 60" fill="none" stroke="white" stroke-width="0.4" opacity="0.2"/>
+  <!-- Cephalic fin (left horn) -->
+  <path d="M68 30 C70 26, 74 22, 76 20 C75 24, 72 28, 68 31" opacity="0.65"/>
+  <!-- Cephalic fin (right horn) -->
+  <path d="M68 40 C70 44, 74 48, 76 50 C75 46, 72 42, 68 39" opacity="0.65"/>
+  <!-- Tail -->
+  <path d="M38 35 C30 35, 18 34, 8 36" fill="none" stroke="white" stroke-width="1.5" opacity="0.5" stroke-linecap="round"/>
+  <!-- Belly markings -->
+  <ellipse cx="58" cy="35" rx="6" ry="3" fill="none" stroke="white" stroke-width="0.4" opacity="0.2"/>
+  <!-- Eyes -->
+  <circle cx="68" cy="32" r="1.2"/>
+  <circle cx="68" cy="32" r="0.5" fill="black"/>
+  <circle cx="68" cy="38" r="1.2"/>
+  <circle cx="68" cy="38" r="0.5" fill="black"/>
+  <!-- Gill slits -->
+  <path d="M62 32 L60 33" fill="none" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <path d="M62 33 L60 34" fill="none" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <path d="M62 37 L60 36" fill="none" stroke="white" stroke-width="0.5" opacity="0.3"/>
+  <path d="M62 38 L60 37" fill="none" stroke="white" stroke-width="0.5" opacity="0.3"/>
+</svg>

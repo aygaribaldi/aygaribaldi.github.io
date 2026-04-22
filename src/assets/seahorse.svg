@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 80" fill="white">
+  <!-- Curled tail -->
+  <path d="M18 60 C19 64, 20 68, 18 72 C16 76, 12 77, 10 74 C8 71, 10 68, 13 67 C15 66, 17 67, 17 64" fill="none" stroke="white" stroke-width="2.5" opacity="0.6" stroke-linecap="round"/>
+  <!-- Body/torso -->
+  <path d="M22 22 C24 28, 24 36, 23 44 C22 50, 20 56, 18 60 C16 56, 15 50, 15 44 C14 36, 14 28, 16 22Z" opacity="0.8"/>
+  <!-- Body ridges -->
+  <path d="M15 28 L23 28" fill="none" stroke="white" stroke-width="0.5" opacity="0.25"/>
+  <path d="M15 33 L23 33" fill="none" stroke="white" stroke-width="0.5" opacity="0.25"/>
+  <path d="M15 38 L23 38" fill="none" stroke="white" stroke-width="0.5" opacity="0.25"/>
+  <path d="M15 43 L22 43" fill="none" stroke="white" stroke-width="0.5" opacity="0.25"/>
+  <path d="M16 48 L21 48" fill="none" stroke="white" stroke-width="0.5" opacity="0.25"/>
+  <path d="M17 53 L20 53" fill="none" stroke="white" stroke-width="0.5" opacity="0.25"/>
+  <!-- Belly curve (pregnant-style pouch) -->
+  <path d="M22 26 C26 32, 26 40, 23 48" fill="none" stroke="white" stroke-width="0.6" opacity="0.3"/>
+  <!-- Head -->
+  <path d="M20 22 C22 18, 24 14, 24 10 C24 6, 21 4, 18 5 C15 6, 13 9, 13 13 C13 17, 15 20, 17 22" opacity="0.85"/>
+  <!-- Snout -->
+  <path d="M24 10 C26 9, 30 8, 33 8 C33 10, 30 11, 26 11 C24 11, 24 10, 24 10Z" opacity="0.75"/>
+  <!-- Coronet (crown) -->
+  <path d="M18 5 C17 2, 19 0, 21 1 C22 0, 24 1, 23 3 C24 2, 26 3, 24 5" fill="none" stroke="white" stroke-width="1" opacity="0.6" stroke-linecap="round"/>
+  <!-- Dorsal fin -->
+  <path d="M14 24 C10 22, 8 18, 9 15 C10 18, 12 21, 14 23" opacity="0.5"/>
+  <path d="M14 28 C10 27, 8 24, 8 22 C9 25, 12 27, 14 28" opacity="0.45"/>
+  <!-- Small pectoral fin -->
+  <path d="M22 24 C25 23, 27 21, 27 20 C26 22, 24 24, 22 25" opacity="0.4"/>
+  <!-- Eye -->
+  <circle cx="21" cy="10" r="1.8"/>
+  <circle cx="21" cy="10" r="0.8" fill="black"/>
+</svg>
