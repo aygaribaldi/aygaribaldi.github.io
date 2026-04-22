@@ -21,9 +21,9 @@ export default function About() {
         </div>
         <div className="col">
           <p>
-            I'm a software engineer who believes life is too short for just one hobby.
-            Based in <strong>NYC</strong>, I build at <strong>Amazon</strong> by day and chase
-            adventures the rest of the time.
+            Software engineer at <strong>Amazon</strong> in <strong>NYC</strong>, building
+            platform infrastructure and advertiser-facing products across the Ads Console.
+            Passionate about web development, developer tooling, and creating great user experiences.
           </p>
           <br />
           <p>
