@@ -7,7 +7,7 @@ export default function Hero() {
         <span className="gradient-text">Garibaldi</span>
       </h1>
       <p className="hero-sub">
-        Building at Amazon by day. Diving, dancing, and exploring by night. Based in NYC.
+        Software Engineer at Amazon · Based in New York City
       </p>
       <a href="#about" className="hero-cta">Dive In ↓</a>
     </section>
