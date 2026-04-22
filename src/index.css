@@ -276,6 +276,44 @@ section {
   color: #00f0ff;
 }
 
+/* Skills */
+.skills-section {
+  flex-direction: column;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.skill-groups {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  margin-top: 1.5rem;
+}
+
+.skill-group-label {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #00f0ff;
+  margin-bottom: 0.8rem;
+}
+
+.skill-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.skill-pill {
+  padding: 0.4rem 0.9rem;
+  border-radius: 50px;
+  font-size: 0.78rem;
+  border: 1px solid rgba(0,240,255,0.08);
+  color: rgba(200,218,232,0.6);
+  background: rgba(0,240,255,0.02);
+}
+
 /* Hobbies */
 .hobbies-section {
   flex-direction: column;
