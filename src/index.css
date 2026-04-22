@@ -254,6 +254,28 @@ section {
   line-height: 1.6;
 }
 
+.exp-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0;
+}
+
+.exp-bullets li {
+  font-size: 0.82rem;
+  color: rgba(138,160,184,0.45);
+  line-height: 1.6;
+  padding-left: 1rem;
+  position: relative;
+  margin-bottom: 0.4rem;
+}
+
+.exp-bullets li::before {
+  content: '▹';
+  position: absolute;
+  left: 0;
+  color: #00f0ff;
+}
+
 /* Hobbies */
 .hobbies-section {
   flex-direction: column;
