@@ -5,10 +5,6 @@ interface Particle {
   color: string; phase: number;
 }
 
-interface Laser {
-  x: number; color: string; speed: number; phase: number; width: number;
-}
-
 interface Jelly {
   x: number; y: number; size: number; color: string;
   speed: number; phase: number;
@@ -62,14 +58,6 @@ export default function NeonCanvas() {
       r: 1 + Math.random() * 3, speed: 0.1 + Math.random() * 0.4,
       color: ['0,240,255', '255,45,170', '94,94,255', '168,85,247'][Math.floor(Math.random() * 4)],
       phase: Math.random() * Math.PI * 2,
-    }));
-
-    const lasers: Laser[] = Array.from({ length: 8 }, (_, i) => ({
-      x: w * 0.1 + i * w * 0.11,
-      color: ['0,240,255', '255,45,170', '94,94,255', '168,85,247', '0,240,255', '255,45,170', '12,250,202', '168,85,247'][i],
-      speed: 0.3 + Math.random() * 0.4,
-      phase: Math.random() * Math.PI * 2,
-      width: 1 + Math.random() * 1.5,
     }));
 
     const jellies: Jelly[] = Array.from({ length: 5 }, (_, i) => ({
@@ -144,20 +132,6 @@ export default function NeonCanvas() {
       for (let y = 0; y < h; y += 60) {
         ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
       }
-
-      // Laser beams
-      lasers.forEach(l => {
-        const angle = Math.sin(t * 0.0008 * l.speed + l.phase) * 0.25;
-        ctx.save();
-        ctx.translate(l.x, h + 20);
-        ctx.rotate(-Math.PI / 2 + angle);
-        const opacity = 0.06 + Math.sin(t * 0.003 + l.phase) * 0.03;
-        ctx.fillStyle = `rgba(${l.color},${opacity})`;
-        ctx.fillRect(-l.width, 0, l.width * 2, h);
-        ctx.fillStyle = `rgba(${l.color},${opacity * 0.3})`;
-        ctx.fillRect(-l.width * 6, 0, l.width * 12, h);
-        ctx.restore();
-      });
 
       // Coral
       corals.forEach(c => {

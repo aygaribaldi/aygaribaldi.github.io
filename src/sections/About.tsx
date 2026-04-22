@@ -27,8 +27,8 @@ export default function About() {
           </p>
           <br />
           <p>
-            I'm a PADI-certified scuba diver, a hip hop dancer, a skier, a field hockey
-            player, a pianist, an avid reader, and a festival regular.
+            Outside of work, you'll find me scuba diving, skiing, dancing hip hop,
+            playing field hockey, reading, or at a music festival.
           </p>
         </div>
       </div>
