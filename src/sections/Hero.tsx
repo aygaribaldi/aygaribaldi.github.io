@@ -7,7 +7,7 @@ export default function Hero() {
         <span className="gradient-text">Garibaldi</span>
       </h1>
       <p className="hero-sub">
-        Software Engineer · New York City
+        Builder of software products. Explorer of everything else.
       </p>
       <a href="#about" className="hero-cta">Dive In ↓</a>
     </section>
