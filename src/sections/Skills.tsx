@@ -19,10 +19,6 @@ const skillGroups = [
     label: 'AI',
     items: ['Amazon Bedrock', 'Claude', 'LLM Agents'],
   },
-  {
-    label: 'Tools',
-    items: ['Git', 'Vite', 'CDK', 'Unity'],
-  },
 ];
 
 export default function Skills() {
