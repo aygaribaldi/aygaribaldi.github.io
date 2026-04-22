@@ -209,20 +209,41 @@ export default function NeonCanvas() {
           const col = Math.floor(i / 3);
           const fx = s.x - col * s.spacing * s.dir + Math.sin(t * 0.003 + i + s.phase) * 4;
           const fy = s.y + (row - 1) * s.spacing * 0.7 + Math.sin(t * 0.004 + i * 0.5) * 3;
-          const sz = 5;
+          const sz = 7;
+          const tailWag = Math.sin(t * 0.005 + i + s.phase) * 2;
           ctx.save();
           ctx.translate(fx, fy);
           if (s.dir === -1) ctx.scale(-1, 1);
+
           ctx.fillStyle = `rgba(${s.color},0.18)`;
           ctx.beginPath();
-          ctx.ellipse(0, 0, sz, sz * 0.4, 0, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.beginPath();
-          ctx.moveTo(-sz, 0);
-          ctx.lineTo(-sz - 3, -2.5);
-          ctx.lineTo(-sz - 3, 2.5);
+          ctx.moveTo(sz, 0);
+          ctx.bezierCurveTo(sz * 0.7, -sz * 0.42, 0, -sz * 0.55, -sz * 0.5, -sz * 0.2);
+          ctx.lineTo(-sz * 0.5, sz * 0.2);
+          ctx.bezierCurveTo(0, sz * 0.55, sz * 0.7, sz * 0.42, sz, 0);
           ctx.closePath();
           ctx.fill();
+
+          ctx.beginPath();
+          ctx.moveTo(-sz * 0.4, -sz * 0.15);
+          ctx.quadraticCurveTo(-sz * 0.8, -sz * 0.45 + tailWag, -sz * 1.15, -sz * 0.5 + tailWag);
+          ctx.lineTo(-sz * 0.7, tailWag * 0.3);
+          ctx.lineTo(-sz * 1.15, sz * 0.5 + tailWag);
+          ctx.quadraticCurveTo(-sz * 0.8, sz * 0.45 + tailWag, -sz * 0.4, sz * 0.15);
+          ctx.closePath();
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.moveTo(sz * 0.15, -sz * 0.42);
+          ctx.quadraticCurveTo(-sz * 0.1, -sz * 0.75, -sz * 0.3, -sz * 0.38);
+          ctx.fillStyle = `rgba(${s.color},0.14)`;
+          ctx.fill();
+
+          ctx.beginPath();
+          ctx.arc(sz * 0.5, -sz * 0.06, sz * 0.07, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(${s.color},0.35)`;
+          ctx.fill();
+
           ctx.restore();
         }
       });
